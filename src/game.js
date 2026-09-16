@@ -179,10 +179,20 @@ class GameManager {
       img.src = src;
     });
 
-    // Unlock Web Audio on first user interaction anywhere
+    // Helper to request horizontal / landscape orientation lock on mobile devices
+    const tryLockLandscape = () => {
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+      } catch (e) {}
+    };
+
+    // Unlock Web Audio & try landscape orientation lock on first user interaction anywhere
     const unlockOnFirstTouch = () => {
       window.soundEngine.unlockAudio();
       window.soundEngine.startTitleMusic();
+      tryLockLandscape();
       window.removeEventListener('pointerdown', unlockOnFirstTouch);
       window.removeEventListener('keydown', unlockOnFirstTouch);
     };
@@ -200,6 +210,7 @@ class GameManager {
     const btnNewGame = document.getElementById('menu-btn-newgame');
     if (btnNewGame) {
       btnNewGame.addEventListener('click', () => {
+        tryLockLandscape();
         window.soundEngine.unlockAudio();
         window.soundEngine.playButtonClick();
         this.startNightWithIntro(1);
@@ -209,6 +220,7 @@ class GameManager {
     const btnContinue = document.getElementById('menu-btn-continue');
     if (btnContinue) {
       btnContinue.addEventListener('click', () => {
+        tryLockLandscape();
         window.soundEngine.unlockAudio();
         window.soundEngine.playButtonClick();
         this.startNightWithIntro(this.saveData.night || 1);
