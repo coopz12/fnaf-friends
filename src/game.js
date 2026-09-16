@@ -101,20 +101,63 @@ class GameManager {
     // Fullscreen Toggles (Start Modal & In-Game HUD)
     const startFsBtn = document.getElementById('start-fs-btn');
     const hudFsBtn = document.getElementById('btn-fullscreen');
+    let lastFsToggle = 0;
+
+    const updateFsButtons = () => {
+      const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      const label = isFs ? '✕ EXIT FULLSCREEN' : '⛶ FULLSCREEN';
+      if (startFsBtn) startFsBtn.textContent = label;
+      if (hudFsBtn) hudFsBtn.textContent = label;
+    };
+
+    document.addEventListener('fullscreenchange', updateFsButtons);
+    document.addEventListener('webkitfullscreenchange', updateFsButtons);
+
+    const showIPhoneToast = () => {
+      let toast = document.getElementById('iphone-fs-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'iphone-fs-toast';
+        toast.className = 'iphone-fs-toast';
+        toast.innerHTML = '📱 <strong>iOS Fullscreen:</strong> Tap Safari Share icon <strong>(⎋)</strong> then <strong>"Add to Home Screen"</strong> for borderless full screen!';
+        document.body.appendChild(toast);
+      }
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 5000);
+    };
 
     const toggleFs = (e) => {
       if (e) {
-        e.preventDefault();
         e.stopPropagation();
       }
+      const now = Date.now();
+      if (now - lastFsToggle < 400) return;
+      lastFsToggle = now;
+
       const doc = document;
       const docEl = doc.documentElement;
-      const isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+      const isFs = !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
+
       if (!isFs) {
-        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
-        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
-        else if (docEl.mozRequestFullScreen) docEl.mozRequestFullScreen();
-        else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+        let req = null;
+        try {
+          if (docEl.requestFullscreen) req = docEl.requestFullscreen();
+          else if (docEl.webkitRequestFullscreen) req = docEl.webkitRequestFullscreen();
+          else if (docEl.mozRequestFullScreen) req = docEl.mozRequestFullScreen();
+          else if (docEl.msRequestFullscreen) req = docEl.msRequestFullscreen();
+        } catch (err) {
+          console.warn('Fullscreen call failed:', err);
+          showIPhoneToast();
+        }
+
+        if (req && req.catch) {
+          req.catch((err) => {
+            console.warn('Fullscreen request rejected:', err);
+            showIPhoneToast();
+          });
+        } else if (!req) {
+          showIPhoneToast();
+        }
         window.scrollTo(0, 1);
       } else {
         if (doc.exitFullscreen) doc.exitFullscreen().catch(() => {});
@@ -126,11 +169,9 @@ class GameManager {
 
     if (startFsBtn) {
       startFsBtn.addEventListener('click', toggleFs);
-      startFsBtn.addEventListener('touchstart', toggleFs, { passive: false });
     }
     if (hudFsBtn) {
       hudFsBtn.addEventListener('click', toggleFs);
-      hudFsBtn.addEventListener('touchstart', toggleFs, { passive: false });
     }
 
     // Custom Night Modal openers & closers

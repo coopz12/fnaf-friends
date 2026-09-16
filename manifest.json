@@ -1,0 +1,21 @@
+﻿{
+  name: Five Nights at Friends,
+  short_name: FNAF Friends,
+  start_url: ./index.html,
+  display: standalone,
+  orientation: landscape,
+  background_color: #000000,
+  theme_color: #000000,
+  icons: [
+    {
+      src: assets/friends/trevor_sunglasses_pose.jpg,
+      sizes: 192x192,
+      type: image/jpeg
+    },
+    {
+      src: assets/friends/trevor_sunglasses_pose.jpg,
+      sizes: 512x512,
+      type: image/jpeg
+    }
+  ]
+}
