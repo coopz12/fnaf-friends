@@ -34,11 +34,41 @@ class SoundEngine {
     };
 
     this.loops = {};
+    this.titleAudio = null;
+    this.runningAudio = null;
+  }
+
+  unlockAudio() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+    } catch (e) {}
+  }
+
+  startTitleMusic() {
+    if (this.titleAudio) return;
+    try {
+      this.titleAudio = new Audio(this.soundPaths.ambience);
+      this.titleAudio.loop = true;
+      this.titleAudio.volume = 0.32;
+      this.titleAudio.play().catch(() => {});
+    } catch (e) {}
+  }
+
+  stopTitleMusic() {
+    if (this.titleAudio) {
+      this.titleAudio.pause();
+      this.titleAudio.currentTime = 0;
+      this.titleAudio = null;
+    }
   }
 
   init() {
     if (this.isInitialized) return;
     this.isInitialized = true;
+    this.stopTitleMusic();
 
     // Preload audio elements
     for (const [key, path] of Object.entries(this.soundPaths)) {
@@ -79,8 +109,10 @@ class SoundEngine {
   }
 
   playRunning() {
+    this.stopRunning();
+
     // 1. Play high-impact stereo audio file with maximum volume
-    const sound = this.play('running', 1.0);
+    this.runningAudio = this.play('running', 1.0);
 
     // 2. High-impact left-channel footsteps synthesis (louder triangle waves + kick punch)
     try {
@@ -122,6 +154,14 @@ class SoundEngine {
       }
     } catch (e) {
       console.warn('Running sound synthesis error:', e);
+    }
+  }
+
+  stopRunning() {
+    if (this.runningAudio) {
+      this.runningAudio.pause();
+      this.runningAudio.currentTime = 0;
+      this.runningAudio = null;
     }
   }
 

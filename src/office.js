@@ -145,26 +145,42 @@ class OfficeController {
       }
     });
 
-    // Wall Buttons Click (supports both mouse click and mobile tap)
-    this.btnLeftDoor.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleLeftDoor();
-    });
+    // Wall Buttons Click (supports both mouse click and instant mobile touch)
+    const setupWallBtn = (btn, action) => {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let lastTouch = 0;
 
-    this.btnRightDoor.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleRightDoor();
-    });
+      btn.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
 
-    this.btnLeftLight.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleLeftLight();
-    });
+      btn.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches[0]) {
+          const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+          const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+          if (dx > 20 || dy > 20) return;
+        }
+        lastTouch = Date.now();
+        e.stopPropagation();
+        e.preventDefault();
+        action();
+      }, { passive: false });
 
-    this.btnRightLight.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleRightLight();
-    });
+      btn.addEventListener('click', (e) => {
+        if (Date.now() - lastTouch < 450) return;
+        e.stopPropagation();
+        action();
+      });
+    };
+
+    setupWallBtn(this.btnLeftDoor, () => this.toggleLeftDoor());
+    setupWallBtn(this.btnRightDoor, () => this.toggleRightDoor());
+    setupWallBtn(this.btnLeftLight, () => this.toggleLeftLight());
+    setupWallBtn(this.btnRightLight, () => this.toggleRightLight());
 
     // Keyboard Shortcuts (Q: Left Door, A: Left Light, E: Right Door, D: Right Light)
     window.addEventListener('keydown', (e) => {

@@ -12,6 +12,9 @@
   <link rel="apple-touch-icon" href="assets/friends/trevor_sunglasses_pose.jpg">
   <link rel="preload" as="image" href="assets/doors/door_left_sheet.png">
   <link rel="preload" as="image" href="assets/doors/door_right_sheet.png">
+  <link rel="preload" as="image" href="assets/title/title_frame_0.png">
+  <link rel="preload" as="image" href="assets/title/title_frame_1.png">
+  <link rel="preload" as="image" href="assets/title/title_frame_2.png">
   <title>Five Nights at Friends</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,27 +26,143 @@
   <div class="crt-overlay"></div>
   <div class="vignette-overlay"></div>
 
-  <!-- Start Game Modal -->
-  <div id="start-overlay" class="start-overlay">
-    <div class="start-box">
-      <h1 class="glitch-text" data-text="FIVE NIGHTS AT FRIENDS">FIVE NIGHTS AT FRIENDS</h1>
-      <p class="subtitle">SECURITY OFFICE - NIGHT 1</p>
-      <div class="controls-legend">
-        <p><strong>Controls:</strong></p>
-        <p>🖱️ <strong>Desktop:</strong> Move mouse to screen edges to look • <kbd>Q</kbd>/<kbd>E</kbd> Doors • <kbd>A</kbd>/<kbd>D</kbd> Lights • <kbd>SPACE</kbd> Monitor</p>
-        <p>📱 <strong>Mobile:</strong> Swipe screen left/right to look • Tap buttons & bottom bar • Rotate phone to landscape</p>
+  <!-- Authentic FNAF 1 Title Screen -->
+  <div id="title-screen" class="title-screen">
+    <!-- Character Shadows Layer (Chris Base & Twitches) -->
+    <div class="title-character-layer">
+      <img id="title-bg-base" class="title-bg-img" src="assets/title/title_frame_0.png" alt="Chris in Shadows">
+      <img id="title-bg-twitch" class="title-bg-img title-twitch-img hidden" src="assets/title/title_frame_1.png" alt="Chris Twitch">
+    </div>
+
+    <!-- Procedural Static & Scanline Canvas -->
+    <canvas id="title-static-canvas" class="title-static-canvas" width="320" height="180"></canvas>
+
+    <!-- Animated Horizontal CRT Scanline -->
+    <div class="title-crt-scanline"></div>
+
+    <!-- Left Column: Title Typography & Authentic Menu -->
+    <div class="title-content-wrapper">
+      <div class="title-logo-block">
+        <h1 class="title-heading">
+          <span class="title-word">Five</span>
+          <span class="title-word">Nights</span>
+          <span class="title-word title-at">at</span>
+          <span class="title-word title-friends">Friends</span>
+        </h1>
       </div>
-      <div class="start-btn-row">
-        <button id="start-btn" class="start-btn">START NIGHT 1</button>
-        <button id="open-custom-btn" class="start-btn secondary-btn">CUSTOM NIGHT</button>
-        <button id="start-fs-btn" class="start-btn fs-btn">⛶ FULLSCREEN</button>
+
+      <nav class="title-menu" id="title-menu">
+        <button id="menu-btn-newgame" class="title-menu-btn active">
+          <span class="menu-cursor">&gt;&gt;</span>
+          <span class="menu-label">New Game</span>
+        </button>
+
+        <button id="menu-btn-continue" class="title-menu-btn">
+          <span class="menu-cursor">&gt;&gt;</span>
+          <span class="menu-label">Continue</span>
+          <span class="menu-night-tag" id="continue-night-tag">Night 1</span>
+        </button>
+
+        <button id="menu-btn-night6" class="title-menu-btn hidden">
+          <span class="menu-cursor">&gt;&gt;</span>
+          <span class="menu-label">6th Night</span>
+        </button>
+
+        <button id="menu-btn-custom" class="title-menu-btn">
+          <span class="menu-cursor">&gt;&gt;</span>
+          <span class="menu-label">Custom Night</span>
+        </button>
+      </nav>
+
+      <!-- Auxiliary Controls Bar -->
+      <div class="title-actions">
+        <button id="title-btn-controls" class="title-action-btn">
+          <span class="action-icon">🎮</span> CONTROLS
+        </button>
+        <button id="title-btn-fs" class="title-action-btn">
+          <span class="action-icon">⛶</span> FULLSCREEN
+        </button>
+        <button id="title-btn-reset" class="title-action-btn title-reset-btn" title="Reset Night Progression">
+          <span>↺</span> RESET SAVE
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Right Copyright / Version Tag -->
+    <div class="title-copyright">
+      <div class="title-version">v 1.2.0</div>
+      <div class="title-copy-text">© 2026 Scott Cawthon / Friends Edition</div>
+    </div>
+  </div>
+
+  <!-- Authentic 12:00 AM Night Intro Screen -->
+  <div id="night-intro-overlay" class="night-intro-overlay hidden">
+    <div class="night-intro-content">
+      <div id="night-intro-time" class="night-intro-time">12:00 AM</div>
+      <div id="night-intro-label" class="night-intro-label">1st Night</div>
+    </div>
+  </div>
+
+  <!-- Authentic FNAF 1 Game Over Screen (Replaces alert) -->
+  <div id="gameover-overlay" class="gameover-overlay hidden">
+    <canvas id="gameover-static-canvas" class="gameover-static-canvas" width="320" height="180"></canvas>
+    <div class="gameover-content">
+      <h1 class="gameover-title glitch-text" data-text="GAME OVER">GAME OVER</h1>
+      <p id="gameover-friend-text" class="gameover-friend-text">Someone caught you in the dark!</p>
+      <div class="gameover-btn-row">
+        <button id="btn-gameover-retry" class="start-btn">RETRY NIGHT</button>
+        <button id="btn-gameover-menu" class="start-btn secondary-btn">MAIN MENU</button>
       </div>
     </div>
   </div>
+
+  <!-- Controls & How to Play Modal -->
+  <div id="controls-modal" class="controls-modal hidden">
+    <div class="controls-box">
+      <div class="controls-header">
+        <h2>HOW TO PLAY & CONTROLS</h2>
+        <button id="btn-close-controls" class="btn-close-modal">✕</button>
+      </div>
+      <div class="controls-content">
+        <div class="ctrl-section">
+          <h3>🖥️ DESKTOP CONTROLS</h3>
+          <ul>
+            <li><strong>Look Around:</strong> Move mouse cursor to screen edges</li>
+            <li><strong>Blast Doors:</strong> Press <kbd>Q</kbd> (Left) or <kbd>E</kbd> (Right), or click red wall buttons</li>
+            <li><strong>Doorway Lights:</strong> Press <kbd>A</kbd> (Left) or <kbd>D</kbd> (Right), or click white wall buttons</li>
+            <li><strong>Camera Monitor:</strong> Press <kbd>SPACE</kbd> / <kbd>S</kbd> or hover over bottom bar</li>
+            <li><strong>Switch Cameras:</strong> Click buttons on minimap (CAM 1A - 7)</li>
+          </ul>
+        </div>
+        <div class="ctrl-section">
+          <h3>📱 MOBILE CONTROLS</h3>
+          <ul>
+            <li><strong>Look Around:</strong> Swipe / drag finger left or right on the screen</li>
+            <li><strong>Doors & Lights:</strong> Tap red and white wall buttons directly</li>
+            <li><strong>Camera Monitor:</strong> Tap bottom bar ("CAMERA MONITOR")</li>
+            <li><strong>Pro Tip:</strong> Rotate to landscape & tap <strong>FULLSCREEN</strong></li>
+          </ul>
+        </div>
+        <div class="ctrl-section">
+          <h3>⚠️ SURVIVAL TIPS</h3>
+          <ul>
+            <li><strong>Trevor (Pirate Cove):</strong> Check CAM 1C often! If he sprints down CAM 2A, slam LEFT door!</li>
+            <li><strong>Chris (Freddy):</strong> Stalks in darkness and kitchen (CAM 6). Don't let power hit 0%!</li>
+            <li><strong>Spencer (Bonnie):</strong> Appears in left doorway. Check light with <kbd>A</kbd>!</li>
+            <li><strong>Daxon (Chica):</strong> Lurks outside right window. Check light with <kbd>D</kbd>!</li>
+          </ul>
+        </div>
+      </div>
+      <div class="controls-footer">
+        <button id="btn-done-controls" class="start-btn">GOT IT</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     if (window.location.search.includes('autostart')) {
-      const overlay = document.getElementById('start-overlay');
-      if (overlay) overlay.style.display = 'none';
+      const title = document.getElementById('title-screen');
+      if (title) title.style.display = 'none';
     }
   </script>
 
@@ -234,6 +353,7 @@
           <p id="win-sub" class="win-sub">You survived Night 1</p>
           <div class="win-btn-group">
             <button id="btn-next-night" class="win-btn-primary">NEXT NIGHT</button>
+            <button id="btn-win-menu" class="win-btn-secondary">MAIN MENU</button>
             <button id="btn-open-custom-from-win" class="win-btn-secondary">CUSTOM NIGHT</button>
           </div>
         </div>
@@ -414,9 +534,9 @@
       }
 
       if (p.get('custom') === '1') {
-        const startOverlay = document.getElementById('start-overlay');
+        const titleScreen = document.getElementById('title-screen') || document.getElementById('start-overlay');
         const customModal = document.getElementById('custom-night-modal');
-        if (startOverlay) startOverlay.classList.add('hidden');
+        if (titleScreen) titleScreen.classList.add('hidden');
         if (customModal) customModal.classList.remove('hidden');
       }
 
