@@ -1708,20 +1708,29 @@ html, body {
     height: 9px;
   }
 
-  /* 4. Bottom camera monitor flip bar slimmed down to preserve vertical office view */
+  /* 4. Bottom camera monitor flip bar elevated above iPhone home gesture bar */
   .cam-monitor-bar {
-    height: 28px;
-    width: 320px;
-    max-width: 70vw;
-    border-radius: 6px 6px 0 0;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    height: 32px;
+    width: 300px;
+    max-width: 65vw;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    border-radius: 8px;
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.95), 0 -2px 12px rgba(0, 0, 0, 0.7);
+  }
+  .cam-monitor-bar::before {
+    content: '';
+    position: absolute;
+    inset: -10px -12px -10px -12px;
+    z-index: 10;
   }
   .cam-bar-handle {
-    font-size: 10px;
-    gap: 6px;
-    letter-spacing: 1px;
+    font-size: 11px;
+    gap: 7px;
+    letter-spacing: 1.5px;
   }
   .cam-bar-icon {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   /* 5. Camera Minimap: scaled down to compact corner minimap leaving 70% of screen open! */

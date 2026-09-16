@@ -459,6 +459,15 @@
       const stage = document.getElementById('office-stage');
       const ledLeftLight = document.getElementById('led-left-light');
       const ledRightLight = document.getElementById('led-right-light');
+      const titleScreen = document.getElementById('title-screen');
+
+      if (p.get('start') === '1' || p.get('light') || p.get('cams') || p.get('pan')) {
+        if (titleScreen) {
+          titleScreen.classList.add('hidden');
+          titleScreen.hidden = true;
+          titleScreen.style.display = 'none';
+        }
+      }
 
       if (p.get('light') === 'left') {
         if (ledLeftLight) ledLeftLight.classList.add('active');

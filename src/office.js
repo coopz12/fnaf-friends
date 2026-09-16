@@ -59,6 +59,7 @@ class OfficeController {
     this.rightDoorCurrentIndex = -1;
     this.leftDoorAnimId = null;
     this.rightDoorAnimId = null;
+    this.renderLoopId = null;
 
     // Preload sprite sheets in memory immediately
     const preloadLeft = new Image();
@@ -469,14 +470,32 @@ class OfficeController {
   }
 
   startRenderLoop() {
-    const loop = () => {
-      // Smooth interpolation for head panning
-      this.currentPanX += (this.targetPanX - this.currentPanX) * 0.085;
-      this.stage.style.transform = `translate3d(${this.currentPanX.toFixed(2)}px, -50%, 0)`;
+    if (this.renderLoopId) {
+      cancelAnimationFrame(this.renderLoopId);
+      this.renderLoopId = null;
+    }
 
-      requestAnimationFrame(loop);
+    let lastAppliedPan = null;
+
+    const loop = () => {
+      // If camera monitor is open, skip panning calculations to keep CPU cool on mobile
+      const monitorOpen = (this.game && this.game.cameras && this.game.cameras.isOpen);
+
+      if (!monitorOpen && this.stage) {
+        const diff = this.targetPanX - this.currentPanX;
+        if (Math.abs(diff) > 0.08) {
+          this.currentPanX += diff * 0.085;
+          const rounded = this.currentPanX.toFixed(2);
+          if (rounded !== lastAppliedPan) {
+            this.stage.style.transform = `translate3d(${rounded}px, -50%, 0)`;
+            lastAppliedPan = rounded;
+          }
+        }
+      }
+
+      this.renderLoopId = requestAnimationFrame(loop);
     };
 
-    requestAnimationFrame(loop);
+    this.renderLoopId = requestAnimationFrame(loop);
   }
 }
