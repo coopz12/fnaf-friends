@@ -40,9 +40,12 @@ class OfficeController {
     this.leftJammed = false;
     this.rightJammed = false;
 
-    // Panning state (Center of 1600px stage on 1280px viewport is -160px)
-    this.currentPanX = -160;
-    this.targetPanX = -160;
+    // Panning state: dynamically center camera on desk/fan
+    const viewW = window.innerWidth;
+    const stageW = this.stage && this.stage.offsetWidth > 0 ? this.stage.offsetWidth : (viewW * 1.55);
+    const maxP = Math.max(0, stageW - viewW);
+    this.currentPanX = - (maxP / 2);
+    this.targetPanX = - (maxP / 2);
 
     // Base asset paths
     this.baseOfficePath = 'assets/office/office_boys.png';
@@ -73,12 +76,12 @@ class OfficeController {
       this.currentPanX = 0;
       this.targetPanX = 0;
     } else if (window.location.search.includes('pan=right')) {
-      this.currentPanX = -320;
-      this.targetPanX = -320;
+      this.currentPanX = -maxP;
+      this.targetPanX = -maxP;
     }
 
-    // Apply transform immediately so headless capture and first frame are perfectly positioned
-    this.stage.style.transform = `translate3d(${this.currentPanX.toFixed(2)}px, 0, 0)`;
+    // Apply transform immediately with vertical center (-50%)
+    this.stage.style.transform = `translate3d(${this.currentPanX.toFixed(2)}px, -50%, 0)`;
 
     this.setupEvents();
     this.startRenderLoop();
@@ -469,7 +472,7 @@ class OfficeController {
     const loop = () => {
       // Smooth interpolation for head panning
       this.currentPanX += (this.targetPanX - this.currentPanX) * 0.085;
-      this.stage.style.transform = `translate3d(${this.currentPanX.toFixed(2)}px, 0, 0)`;
+      this.stage.style.transform = `translate3d(${this.currentPanX.toFixed(2)}px, -50%, 0)`;
 
       requestAnimationFrame(loop);
     };

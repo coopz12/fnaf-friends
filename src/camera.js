@@ -638,23 +638,30 @@ class CameraController {
 
   startPanLoop() {
     const loop = () => {
-      if (this.isOpen && !this.isAnimating) {
+      if (this.isOpen && !this.isAnimating && this.camFeedContainer && this.camScreenEl) {
         const now = performance.now();
         const dt = (now - this.lastPanTime) / 1000;
         this.lastPanTime = now;
 
-        // Smoothly sway the camera feed left and right
-        this.panX += this.panDirection * this.panSpeed * dt;
+        // Dynamically compute safe pan limit: never reveal black edges!
+        const maxPan = Math.max(0, this.camFeedContainer.offsetWidth - this.camScreenEl.offsetWidth);
 
-        if (this.panX <= -this.maxPan) {
-          this.panX = -this.maxPan;
-          this.panDirection = 1; // Reverse toward left
-        } else if (this.panX >= 0) {
+        if (maxPan > 0) {
+          this.panX += this.panDirection * this.panSpeed * dt;
+
+          if (this.panX <= -maxPan) {
+            this.panX = -maxPan;
+            this.panDirection = 1; // Reverse toward left
+          } else if (this.panX >= 0) {
+            this.panX = 0;
+            this.panDirection = -1; // Reverse toward right
+          }
+
+          this.camFeedContainer.style.transform = `translate3d(${this.panX.toFixed(1)}px, 0, 0)`;
+        } else {
           this.panX = 0;
-          this.panDirection = -1; // Reverse toward right
+          this.camFeedContainer.style.transform = 'translate3d(0, 0, 0)';
         }
-
-        this.camFeedContainer.style.transform = `translateX(${this.panX.toFixed(1)}px)`;
       } else {
         this.lastPanTime = performance.now();
       }

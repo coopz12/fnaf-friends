@@ -555,12 +555,11 @@ body {
 
 .office-stage {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
-  /* Guarantee generous horizontal panning across all phone aspect ratios */
-  height: 100vh;
-  height: 100dvh;
-  width: max(calc(100dvh * (1600 / 720)), calc(100vw * 1.35));
+  /* Guarantee authentic FNAF security desk FOV: wide enough that player MUST pan left and right */
+  width: max(calc(100dvh * (1600 / 720)), calc(100vw * 1.55));
+  height: calc(max(calc(100dvh * (1600 / 720)), calc(100vw * 1.55)) * (720 / 1600));
   will-change: transform;
 }
 
@@ -733,31 +732,6 @@ body {
   letter-spacing: 2px;
   color: #a0acbc;
   margin-top: 6px;
-}
-
-.hud-fs-btn {
-  pointer-events: auto;
-  margin-top: 8px;
-  background: rgba(18, 26, 20, 0.88);
-  border: 1px solid var(--fnaf-green);
-  color: var(--fnaf-green);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 1px;
-  padding: 4px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: all 0.15s ease;
-  box-shadow: 0 0 8px rgba(57, 255, 20, 0.25);
-  display: inline-block;
-}
-
-.hud-fs-btn:hover, .hud-fs-btn:active {
-  background: var(--fnaf-green);
-  color: #000;
-  box-shadow: 0 0 16px rgba(57, 255, 20, 0.7);
 }
 
 .hud-power {
@@ -958,7 +932,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: calc(100% + 80px);
   height: 100%;
   will-change: transform;
   pointer-events: none;
@@ -1709,11 +1683,11 @@ body {
     padding: 6px 16px;
   }
 
-  /* 2. Office stage fills dynamic viewport height */
+  /* 2. Office stage fills dynamic viewport height with authentic FNAF panning */
   .office-stage {
-    height: 100vh;
-    height: 100dvh;
-    width: calc(100dvh * (1600 / 720));
+    top: 50%;
+    width: max(calc(100dvh * (1600 / 720) * 1.35), calc(100vw * 1.55));
+    height: calc(max(calc(100dvh * (1600 / 720) * 1.35), calc(100vw * 1.55)) * (720 / 1600));
   }
 
   /* 3. Wall control panels (Doors & Lights) scaled so they don't block doorway views */
@@ -1795,11 +1769,6 @@ body {
   .night-text {
     font-size: 12px;
     margin-top: 2px;
-  }
-  .hud-fs-btn {
-    font-size: 9px;
-    padding: 2px 6px;
-    margin-top: 4px;
   }
   .cam-hud-topleft {
     top: 8px;
