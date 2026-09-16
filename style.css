@@ -1,0 +1,1258 @@
+/* ==========================================================================
+   FIVE NIGHTS AT FRIENDS - AUTHENTIC FNAF 1 STYLING
+   ========================================================================== */
+
+:root {
+  --fnaf-green: #39ff14;
+  --fnaf-yellow: #ffdd33;
+  --fnaf-red: #ff2222;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+  font-family: 'Share Tech Mono', monospace;
+  color: #fff;
+  cursor: crosshair;
+}
+
+/* ==========================================================================
+   AUTHENTIC CRT SCANLINES & VIGNETTE
+   ========================================================================== */
+
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 900;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+  background-size: 100% 4px, 6px 100%;
+  opacity: 0.8;
+}
+
+.vignette-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 901;
+  background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.5) 80%, rgba(0, 0, 0, 0.95) 100%);
+}
+
+/* ==========================================================================
+   START GAME MODAL
+   ========================================================================== */
+
+.start-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(4, 5, 8, 0.96);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+}
+
+.start-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.start-box {
+  background: #0d1017;
+  border: 2px solid #232a36;
+  padding: 36px 44px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 580px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(57, 255, 20, 0.1);
+}
+
+.glitch-text {
+  font-family: 'VT323', monospace;
+  font-size: 50px;
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.8), -2px 0 #ff2222, 2px 0 #39ff14;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 17px;
+  letter-spacing: 3px;
+  color: #7b889a;
+  margin-bottom: 22px;
+}
+
+.controls-legend {
+  text-align: left;
+  background: #080a0e;
+  border: 1px solid #1c222c;
+  padding: 16px 20px;
+  border-radius: 6px;
+  margin-bottom: 26px;
+  line-height: 1.8;
+  font-size: 14px;
+  color: #b8c0cc;
+}
+
+.controls-legend kbd {
+  background: #202734;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid #3a4557;
+  color: var(--fnaf-yellow);
+  font-weight: bold;
+}
+
+.start-btn {
+  background: #142016;
+  border: 2px solid var(--fnaf-green);
+  color: var(--fnaf-green);
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  letter-spacing: 2px;
+  padding: 12px 36px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+}
+
+.start-btn:hover {
+  background: var(--fnaf-green);
+  color: #000;
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.9);
+  transform: scale(1.03);
+}
+
+.start-btn-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.start-btn.secondary-btn {
+  background: #151a22;
+  border: 2px solid #3d4f66;
+  color: #a7c1e5;
+  box-shadow: 0 0 15px rgba(61, 79, 102, 0.3);
+}
+
+.start-btn.secondary-btn:hover {
+  background: #253347;
+  color: #fff;
+  border-color: #628bc4;
+  box-shadow: 0 0 25px rgba(98, 139, 196, 0.6);
+  transform: scale(1.03);
+}
+
+/* ==========================================================================
+   STAGE & PANORAMIC OFFICE
+   ========================================================================== */
+
+.viewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.office-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Maintain canonical 1600x720 aspect ratio across any monitor */
+  height: 100vh;
+  width: calc(100vh * (1600 / 720));
+  will-change: transform;
+}
+
+.office-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  image-rendering: auto;
+}
+
+/* ==========================================================================
+   DOORWAYS & ANIMATED BLAST DOORS
+   ========================================================================== */
+
+.door-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: none; /* Shown when door is active */
+  z-index: 10;
+  pointer-events: none;
+}
+
+.door-container.active {
+  display: block;
+}
+
+.left-door-container {
+  left: calc(100% * (70 / 1600));
+  width: calc(100% * (223 / 1600));
+}
+
+.right-door-container {
+  left: calc(100% * (1250 / 1600));
+  width: calc(100% * (248 / 1600));
+}
+
+.door-frame-img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+/* ==========================================================================
+   WALL CONTROL BUTTON PANELS
+   ========================================================================== */
+
+.wall-panel {
+  position: absolute;
+  top: 34%;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #1a1e26;
+  border: 3px solid #0d0f14;
+  border-radius: 6px;
+  padding: 10px 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.85);
+}
+
+.left-wall-panel {
+  left: calc(100% * (15 / 1600));
+}
+
+.right-wall-panel {
+  right: calc(100% * (15 / 1600));
+}
+
+.wall-btn {
+  background: #252a36;
+  border: 2px solid #10131a;
+  border-radius: 4px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: all 0.08s ease;
+  box-shadow: 0 4px 0 #0c0e12, 0 6px 10px rgba(0,0,0,0.5);
+}
+
+.wall-btn:hover {
+  filter: brightness(1.2);
+}
+
+.wall-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #0c0e12, 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.btn-led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid #000;
+}
+
+.red-led {
+  background: #4a0d0d;
+}
+
+.red-led.active {
+  background: #ff2222;
+  box-shadow: 0 0 12px #ff2222, 0 0 24px rgba(255, 34, 34, 0.8);
+}
+
+.white-led {
+  background: #3b3a2a;
+}
+
+.white-led.active {
+  background: #fff8aa;
+  box-shadow: 0 0 12px #fff8aa, 0 0 24px rgba(255, 248, 170, 0.9);
+}
+
+/* ==========================================================================
+   AUTHENTIC HUD (CLOCK & POWER)
+   ========================================================================== */
+
+.hud-clock {
+  position: fixed;
+  top: 25px;
+  right: 40px;
+  text-align: right;
+  z-index: 500;
+  pointer-events: none;
+}
+
+.time-text {
+  font-family: 'VT323', monospace;
+  font-size: 64px;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  line-height: 1;
+}
+
+.night-text {
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: #a0acbc;
+  margin-top: 6px;
+}
+
+.hud-power {
+  position: fixed;
+  bottom: 25px;
+  left: 40px;
+  z-index: 500;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.power-line {
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: #fff;
+}
+
+#power-percent {
+  font-family: 'VT323', monospace;
+  font-size: 32px;
+  color: var(--fnaf-green);
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+}
+
+.usage-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.usage-bars {
+  display: flex;
+  gap: 5px;
+}
+
+.usage-pip {
+  width: 14px;
+  height: 22px;
+  background: #14171e;
+  border: 1px solid #283040;
+}
+
+.usage-pip.active-green {
+  background: var(--fnaf-green);
+  box-shadow: 0 0 8px var(--fnaf-green);
+}
+
+.usage-pip.active-yellow {
+  background: var(--fnaf-yellow);
+  box-shadow: 0 0 8px var(--fnaf-yellow);
+}
+
+.usage-pip.active-red {
+  background: var(--fnaf-red);
+  box-shadow: 0 0 10px var(--fnaf-red);
+}
+
+/* ==========================================================================
+   AUTHENTIC CAMERA MONITOR FLIP BAR
+   ========================================================================== */
+
+.cam-monitor-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 560px;
+  max-width: 90vw;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  height: 52px;
+  background: rgba(18, 22, 30, 0.88);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 850; /* Must stay in front of camera-monitor (z-index 600) so it can close! */
+  transition: all 0.2s ease;
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.85);
+  pointer-events: auto;
+}
+
+.cam-monitor-bar:hover {
+  background: rgba(30, 48, 65, 0.98);
+  border-color: var(--fnaf-green);
+  box-shadow: 0 -6px 30px rgba(57, 255, 20, 0.55);
+}
+
+.cam-monitor-bar.open {
+  background: rgba(16, 32, 22, 0.92);
+  border-color: var(--fnaf-green);
+  box-shadow: 0 -4px 25px rgba(57, 255, 20, 0.4);
+}
+
+.cam-monitor-bar.open:hover {
+  background: rgba(22, 45, 30, 0.98);
+  box-shadow: 0 -6px 35px rgba(57, 255, 20, 0.75);
+}
+
+.cam-bar-handle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+.cam-bar-icon {
+  font-size: 14px;
+  color: var(--fnaf-green);
+  transition: transform 0.2s ease;
+}
+
+.cam-monitor-bar.open .cam-bar-icon {
+  transform: rotate(180deg);
+}
+
+/* ==========================================================================
+   MINIMAL BOTTOM CONTROLS HINT BAR
+   ========================================================================== */
+
+.minimal-controls-bar {
+  position: fixed;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10, 14, 20, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #8c9cb0;
+  pointer-events: none;
+  z-index: 840;
+}
+
+.ctrl-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ctrl-chip kbd {
+  background: #1c2330;
+  border: 1px solid #364254;
+  color: var(--fnaf-yellow);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.ctrl-sep {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================================================
+   AUTHENTIC FNAF 1 CAMERA MONITOR TABLET SCREEN
+   ========================================================================== */
+
+.camera-monitor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 600;
+  overflow: hidden;
+  background: #000;
+}
+
+.camera-monitor.hidden {
+  display: none;
+}
+
+.cam-screen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cam-feed-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.cam-feed-img {
+  height: 100%;
+  width: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* Genuine CRT Static Noise Overlay (Procedural Canvas) */
+.cam-static-canvas,
+.cam-static-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 610;
+  opacity: 0.16;
+  mix-blend-mode: screen;
+  transition: opacity 0.08s ease;
+}
+
+/* Top Left HUD */
+.cam-hud-topleft {
+  position: absolute;
+  top: 36px;
+  left: 45px;
+  z-index: 620;
+  pointer-events: none;
+  font-family: 'Share Tech Mono', monospace;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.95), 0 0 4px #000;
+}
+
+.cam-rec-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ff2222;
+  margin-bottom: 8px;
+}
+
+.rec-dot {
+  font-size: 24px;
+  animation: rec-blink 1s infinite steps(1);
+}
+
+@keyframes rec-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.rec-text {
+  letter-spacing: 3px;
+}
+
+.cam-title-code {
+  font-size: 32px;
+  letter-spacing: 4px;
+  color: #fff;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+.cam-title-name {
+  font-size: 19px;
+  letter-spacing: 2px;
+  color: #92a2b4;
+  margin-top: 4px;
+}
+
+/* Kitchen CAM 6 Overlay */
+.cam-special-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 615;
+  pointer-events: none;
+  text-align: center;
+}
+
+.cam-special-overlay.hidden {
+  display: none;
+}
+
+.kitchen-glitch-text {
+  font-family: 'VT323', monospace;
+  font-size: 48px;
+  letter-spacing: 6px;
+  color: #ff3333;
+  text-shadow: 0 0 16px rgba(255, 51, 51, 0.8);
+  animation: kitchen-flicker 1.5s infinite;
+}
+
+@keyframes kitchen-flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.85; }
+  50% { opacity: 0.3; }
+  55% { opacity: 0.9; }
+  80% { opacity: 0.6; }
+}
+
+.kitchen-subtext {
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: #8c9cb0;
+  margin-top: 8px;
+}
+
+.kitchen-audio-wave {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  height: 36px;
+  align-items: center;
+}
+
+.kitchen-audio-wave span {
+  width: 6px;
+  background: #ff3333;
+  border-radius: 3px;
+  animation: wave 0.8s infinite ease-in-out alternate;
+}
+
+.kitchen-audio-wave span:nth-child(1) { height: 16px; animation-delay: 0.1s; }
+.kitchen-audio-wave span:nth-child(2) { height: 32px; animation-delay: 0.3s; }
+.kitchen-audio-wave span:nth-child(3) { height: 24px; animation-delay: 0.2s; }
+.kitchen-audio-wave span:nth-child(4) { height: 36px; animation-delay: 0.4s; }
+.kitchen-audio-wave span:nth-child(5) { height: 18px; animation-delay: 0.15s; }
+
+@keyframes wave {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1.2); }
+}
+
+.kitchen-note {
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #ffaa33;
+  margin-top: 20px;
+}
+
+/* Bottom Right Map Wrapper */
+.cam-map-wrapper {
+  position: absolute;
+  right: 25px;
+  bottom: 25px;
+  width: 580px;
+  height: 420px;
+  z-index: 620;
+  pointer-events: auto;
+}
+
+.cam-map-blueprint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.9));
+}
+
+.you-indicator {
+  position: absolute;
+  left: 284px;
+  top: 382px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 625;
+  pointer-events: none;
+}
+
+.you-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #32f038;
+  box-shadow: 0 0 8px #32f038;
+  animation: you-blink 1.2s infinite ease-in-out;
+}
+
+@keyframes you-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+.you-text {
+  display: none;
+}
+
+/* Interactive Camera Buttons */
+.cam-btn {
+  position: absolute;
+  width: 52px;
+  height: 31px;
+  background: transparent;
+  border: none;
+  color: transparent;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease;
+  z-index: 630;
+}
+
+.cam-btn:hover {
+  background: rgba(50, 240, 56, 0.2);
+  border: 1px solid rgba(50, 240, 56, 0.5);
+  box-shadow: 0 0 10px rgba(50, 240, 56, 0.4);
+}
+
+.cam-btn.active {
+  background: #18981e;
+  border: 2px solid #32f038;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(50, 240, 56, 0.9), inset 0 0 6px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 0 4px #000;
+}
+
+.btn-text {
+  pointer-events: none;
+}
+
+/* Tablet Animation Overlay */
+.cam-flip-anim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 650;
+  pointer-events: none;
+}
+
+.cam-flip-anim.hidden {
+  display: none;
+}
+
+.cam-flip-anim img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+/* ==========================================================================
+   AUTHENTIC JUMPSCARE OVERLAY
+   ========================================================================== */
+
+.jumpscare-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: jumpscare-shake 0.08s infinite alternate;
+}
+
+.jumpscare-overlay.hidden {
+  display: none;
+}
+
+.jumpscare-overlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: jumpscare-strobe 0.12s infinite alternate;
+}
+
+@keyframes jumpscare-shake {
+  0% { transform: translate(-8px, -6px) scale(1.05); }
+  50% { transform: translate(6px, 8px) scale(1.08); }
+  100% { transform: translate(-6px, 4px) scale(1.03); }
+}
+
+@keyframes jumpscare-strobe {
+  0% { filter: brightness(1.6) contrast(2.2) saturate(1.8); }
+  100% { filter: brightness(0.6) contrast(1.8) saturate(0.8) hue-rotate(-20deg); }
+}
+
+/* ==========================================================================
+   START BUTTON ROW & SECONDARY BUTTONS
+   ========================================================================== */
+.start-btn-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.start-btn.secondary-btn {
+  background: #1b2432;
+  border-color: #405572;
+  color: #a7c1e5;
+}
+.start-btn.secondary-btn:hover {
+  background: #253347;
+  border-color: #628bc4;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(98, 139, 196, 0.4);
+}
+
+/* ==========================================================================
+   PHONE GUY CALL WIDGET (TOP LEFT)
+   ========================================================================== */
+.phone-call-widget {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10, 12, 16, 0.88);
+  border: 1px solid #334455;
+  padding: 8px 16px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+}
+.phone-call-widget.hidden { display: none; }
+
+.phone-rec-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff2222;
+  box-shadow: 0 0 8px #ff2222;
+  animation: phone-blink 1s infinite alternate;
+}
+@keyframes phone-blink {
+  0% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+.phone-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: #e0e6ed;
+}
+
+.phone-mute-btn {
+  background: #261616;
+  border: 1px solid #882222;
+  color: #ff8888;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.phone-mute-btn:hover {
+  background: #ff2222;
+  color: #000;
+  box-shadow: 0 0 8px #ff2222;
+}
+
+/* ==========================================================================
+   CREEPY HALLUCINATIONS ("IT'S ME")
+   ========================================================================== */
+.hallucination-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1800;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.hallucination-overlay.hidden { display: none; }
+
+.hallucination-overlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(2.5) brightness(1.2) invert(0.9);
+  animation: jumpscare-shake 0.04s infinite;
+}
+
+.hallucination-text {
+  position: absolute;
+  font-family: 'VT323', monospace;
+  font-size: 120px;
+  color: #fff;
+  letter-spacing: 16px;
+  text-shadow: 0 0 20px #ff0000, 0 0 40px #39ff14;
+  animation: jumpscare-shake 0.05s infinite alternate;
+}
+
+/* ==========================================================================
+   AUTHENTIC 6:00 AM WIN OVERLAY
+   ========================================================================== */
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.win-overlay.hidden { display: none; }
+
+.win-modal-box {
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+}
+
+.win-clock-display {
+  margin-bottom: 24px;
+}
+
+.win-digit {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 110px;
+  color: #fff;
+  letter-spacing: 6px;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.9), 0 0 60px rgba(57, 255, 20, 0.6);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+}
+
+.win-digit.flip {
+  animation: clock-flip 0.35s ease-out;
+}
+
+@keyframes clock-flip {
+  0% { transform: translateY(-40px) scale(0.9); opacity: 0; }
+  50% { transform: translateY(10px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.win-title {
+  font-family: 'VT323', monospace;
+  font-size: 56px;
+  letter-spacing: 4px;
+  color: #39ff14;
+  text-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+  margin-bottom: 10px;
+}
+
+.win-stars {
+  color: #ffdd33;
+  font-size: 36px;
+  letter-spacing: 8px;
+  margin-bottom: 14px;
+}
+
+.win-sub {
+  font-size: 18px;
+  color: #a0b2c6;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+.win-btn-group {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.win-btn-primary {
+  background: #39ff14;
+  color: #000;
+  font-family: 'VT323', monospace;
+  font-size: 26px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.2s;
+}
+.win-btn-primary:hover {
+  background: #5cff3d;
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.8);
+}
+
+.win-btn-secondary {
+  background: #1b2432;
+  color: #a7c1e5;
+  font-family: 'VT323', monospace;
+  font-size: 26px;
+  padding: 12px 28px;
+  border: 1px solid #405572;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  transition: all 0.2s;
+}
+.win-btn-secondary:hover {
+  background: #253347;
+  color: #fff;
+  border-color: #628bc4;
+}
+
+/* ==========================================================================
+   CUSTOM NIGHT MODAL (AI 0 - 20 SELECTOR)
+   ========================================================================== */
+.custom-night-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.custom-night-modal.hidden { display: none; }
+
+.custom-night-box {
+  background: #0d1117;
+  border: 2px solid #232d3d;
+  border-radius: 8px;
+  padding: 30px;
+  width: 95%;
+  max-width: 860px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+.custom-title {
+  font-family: 'VT323', monospace;
+  font-size: 48px;
+  letter-spacing: 4px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.custom-subtitle {
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: #7b889a;
+  margin-bottom: 24px;
+}
+
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.custom-card {
+  background: #151a22;
+  border: 1px solid #232e3d;
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.custom-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  border: 1px solid #2d3b4e;
+}
+
+.custom-card-name {
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #e0e6ed;
+  margin-bottom: 12px;
+}
+
+.custom-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step-btn {
+  background: #232d3d;
+  border: 1px solid #3d4f66;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.step-btn:hover {
+  background: #39ff14;
+  color: #000;
+  border-color: #39ff14;
+}
+
+.step-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 26px;
+  font-weight: bold;
+  width: 40px;
+  color: #ffdd33;
+}
+
+.custom-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.custom-btn {
+  background: #1b2432;
+  color: #a7c1e5;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  padding: 10px 24px;
+  border: 1px solid #405572;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.custom-btn:hover {
+  background: #253347;
+  color: #fff;
+}
+
+.custom-btn.start {
+  background: #39ff14;
+  color: #000;
+  border-color: #39ff14;
+  font-weight: bold;
+}
+.custom-btn.start:hover {
+  background: #5cff3d;
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.6);
+}
+
+.custom-btn.danger {
+  background: #3a1111;
+  color: #ff5555;
+  border-color: #882222;
+}
+.custom-btn.danger:hover {
+  background: #ff2222;
+  color: #000;
+  box-shadow: 0 0 20px rgba(255, 34, 34, 0.6);
+}
+
+/* ==========================================================================
+   JAMMED DOOR & LIGHT BUTTONS
+   ========================================================================== */
+.wall-btn.jammed {
+  opacity: 0.6;
+  cursor: not-allowed;
+  animation: jammed-flicker 0.2s infinite alternate;
+}
+@keyframes jammed-flicker {
+  0% { filter: brightness(0.6) hue-rotate(0deg); }
+  100% { filter: brightness(1.2) hue-rotate(-20deg); }
+}
+
+/* ==========================================================================
+   MOBILE & SMALL SCREEN RESPONSIVE SCALING
+   ========================================================================== */
+@media screen and (max-height: 550px) {
+  .cam-map-wrapper {
+    transform: scale(0.68);
+    transform-origin: bottom right;
+    right: 12px;
+    bottom: 50px;
+  }
+  .hud-power {
+    bottom: 54px;
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+  .hud-clock {
+    top: 10px;
+    right: 16px;
+  }
+  .cam-hud-topleft {
+    top: 12px;
+    left: 16px;
+  }
+  .minimal-controls-bar {
+    display: none; /* Auto-hide keyboard hints on mobile viewports */
+  }
+}
+
+@media screen and (max-width: 900px) and (orientation: portrait) {
+  .cam-map-wrapper {
+    transform: scale(0.55);
+    transform-origin: bottom right;
+    right: 5px;
+    bottom: 55px;
+  }
+  .hud-power {
+    bottom: 55px;
+  }
+}
+
+

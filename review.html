@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FNAF Friends - Photo Verification Gallery</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0c0f14; color: #e0e6ed; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 30px; }
+    h1 { text-align: center; color: #39ff14; font-family: monospace; font-size: 32px; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 0 12px rgba(57,255,20,0.4); }
+    p.subtitle { text-align: center; color: #8a99ad; margin-bottom: 30px; font-size: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; max-width: 1400px; margin: 0 auto; }
+    .photo-card { background: #151a24; border: 1px solid #283344; border-radius: 12px; overflow: hidden; position: relative; display: flex; flex-direction: column; box-shadow: 0 8px 24px rgba(0,0,0,0.5); transition: transform 0.2s, border-color 0.2s; }
+    .photo-card:hover { transform: translateY(-4px); border-color: #39ff14; }
+    .card-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.85); color: #39ff14; font-family: monospace; font-size: 18px; font-weight: bold; padding: 4px 10px; border-radius: 6px; border: 1px solid #39ff14; z-index: 10; }
+    .img-wrap { width: 100%; height: 320px; background: #080a0e; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+    .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .card-current { font-size: 15px; margin-bottom: 8px; font-weight: bold; }
+    .name-tag { color: #ffca3a; }
+    .card-desc { font-size: 13px; color: #9bb0c9; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <h1>ALL 29 PHOTOS - VERIFICATION GALLERY</h1>
+  <p class="subtitle">Check the numbers below. Reply in chat with any numbers that are tagged as the wrong person (e.g., '#7 is actually Trevor', '#1 is Chris', etc.).</p>
+  <div class="grid">
+    
+    <div class="photo-card">
+      <div class="card-badge">#01</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_01.jpg" alt="Photo #1" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Spencer</span></div>
+        <div class="card-desc">Boy with wavy curly brown hair leaning back dazed against dark trees/rocks</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#02</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_02.jpg" alt="Photo #2" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Eating a slice of cheese pizza at an outdoor picnic table with water bottles</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#03</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_03.jpg" alt="Photo #3" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Looking straight up screaming at ceiling in dark blue Seahawks jersey #14 (Jumpscare)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#04</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_04.jpg" alt="Photo #4" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Curly hair and glasses sticking tongue out in pink dress and sneakers (Show Stage center frontman)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#05</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_05.jpg" alt="Photo #5" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Trevor</span></div>
+        <div class="card-desc">At night picnic table wearing black JESUS SAVES shirt (Office left doorway)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#06</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_06.jpg" alt="Photo #6" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Daxon</span></div>
+        <div class="card-desc">Close-up smiling wide with big goofy grin and brown hair (Show Stage right)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#07</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_07.jpg" alt="Photo #7" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Extreme close-up selfie looking through black glasses over top of frames with smirk</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#08</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_08.jpg" alt="Photo #8" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Spencer</span></div>
+        <div class="card-desc">Sitting strapped into carnival drop-tower ride (STRICTLY CAM 1B Dining Table ONLY!)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#09</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_09.jpg" alt="Photo #9" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Trevor</span></div>
+        <div class="card-desc">Snapchat (Trevor Coan) illuminated in blood-red LED room lights (Pirate Cove Stage 2 Peek)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#10</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_10.jpg" alt="Photo #10" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Trevor</span></div>
+        <div class="card-desc">Close-up selfie in blood-red LED light with wide eyes and parted mouth (Demonic Jumpscare)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#11</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_11.jpg" alt="Photo #11" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Trevor</span></div>
+        <div class="card-desc">Outdoors on sunny basketball court: posing tilting sunglasses (Pirate Cove Stage 3 Outside)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#12</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_12.jpg" alt="Photo #12" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Daxon</span></div>
+        <div class="card-desc">Fisheye lens extreme close-up of face looking down at camera from above</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#13</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_13.jpg" alt="Photo #13" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Daxon</span></div>
+        <div class="card-desc">Bowl of cooked spaghetti noodles upside down on head like hair (East Hall Corner &amp; Right Window)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#14</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_14.jpg" alt="Photo #14" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Daxon</span></div>
+        <div class="card-desc">Leaning in smiling at camera in gray WASHINGTON FOOTBALL shirt at waterfall (Restrooms CAM 7)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#15</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_15.jpg" alt="Photo #15" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Spencer</span></div>
+        <div class="card-desc">Wearing black gaming headset over ears, looking wide-eyed with open mouth (Backstage CAM 5)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#16</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_16.jpg" alt="Photo #16" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Full body in shoe store aisle wearing maroon CARHARTT shirt &amp; hoodie (East Hall CAM 4A &amp; Right Doorway)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#17</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_17.jpg" alt="Photo #17" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">On grass in purple Lake Stevens VIKINGS football compression shirt &amp; shorts (East Hall Corner CAM 4B)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#18</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_18.jpg" alt="Photo #18" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Resting on elbows with chin in hands and glasses (Dining Area CAM 1B Table)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#19</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_19.jpg" alt="Photo #19" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Daxon</span></div>
+        <div class="card-desc">Distorted wide perspective sticking tongue out (Office Right Window &amp; Jumpscare)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#20</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_20.jpg" alt="Photo #20" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Extreme close-up staring forward with ponytail (East Hall Corner CAM 4B Freddy Stare)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#21</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_21.jpg" alt="Photo #21" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Spencer</span></div>
+        <div class="card-desc">Low angle looking down with mouth puckered (West Hall Corner CAM 2B &amp; Spencer Jumpscare)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#22</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_22.png" alt="Photo #22" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Daxon</span></div>
+        <div class="card-desc">Mouth open wide and spiky hair (Dining Area CAM 1B &amp; Daxon Jumpscare)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#23</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_23.jpg" alt="Photo #23" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Daxon</span></div>
+        <div class="card-desc">Smug smirk with arched eyebrow in white shirt (East Hall CAM 4A)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#24</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_24.jpg" alt="Photo #24" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Secret Easter Egg</span></div>
+        <div class="card-desc">Dog wearing Air Jordan sneakers on paws (Supply Closet CAM 3 Floor)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#25</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_25.jpg" alt="Photo #25" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Spencer</span></div>
+        <div class="card-desc">Young &amp; chubby in green t-shirt with tongue out (Supply Closet CAM 3)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#26</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_26.jpg" alt="Photo #26" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Chris</span></div>
+        <div class="card-desc">Shirtless with black glasses and double-chin smirk (Office Right Window)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#27</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_27.jpg" alt="Photo #27" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Secret Easter Egg</span></div>
+        <div class="card-desc">Spencer shirtless posing next to Judy Hopps bunny (Backstage CAM 5)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#28</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_28.jpg" alt="Photo #28" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Spencer</span></div>
+        <div class="card-desc">Sitting on floor holding melting chocolate bar looking sad (Supply Closet CAM 3 Dark Corner)</div>
+      </div>
+    </div>
+    
+    <div class="photo-card">
+      <div class="card-badge">#29</div>
+      <div class="img-wrap"><img src="assets/uploads/photo_29.png" alt="Photo #29" loading="lazy"></div>
+      <div class="card-body">
+        <div class="card-current">Current ID: <span class="name-tag">Trevor</span></div>
+        <div class="card-desc">Extreme close-up with glowing blue eyes filter (Pirate Cove CAM 1C &amp; West Hall Sprint CAM 2A)</div>
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>

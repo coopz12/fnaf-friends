@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+  <title>Five Nights at Friends</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Authentic CRT Scanlines & Screen Vignette Overlay -->
+  <div class="crt-overlay"></div>
+  <div class="vignette-overlay"></div>
+
+  <!-- Start Game Modal -->
+  <div id="start-overlay" class="start-overlay">
+    <div class="start-box">
+      <h1 class="glitch-text" data-text="FIVE NIGHTS AT FRIENDS">FIVE NIGHTS AT FRIENDS</h1>
+      <p class="subtitle">SECURITY OFFICE - NIGHT 1</p>
+      <div class="controls-legend">
+        <p><strong>Controls:</strong></p>
+        <p>🖱️ <strong>Desktop:</strong> Move mouse to screen edges to look • <kbd>Q</kbd>/<kbd>E</kbd> Doors • <kbd>A</kbd>/<kbd>D</kbd> Lights • <kbd>SPACE</kbd> Monitor</p>
+        <p>📱 <strong>Mobile:</strong> Swipe screen left/right to look • Tap buttons & bottom bar • Rotate phone to landscape</p>
+      </div>
+      <div class="start-btn-row">
+        <button id="start-btn" class="start-btn">START NIGHT 1</button>
+        <button id="open-custom-btn" class="start-btn secondary-btn">CUSTOM NIGHT</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    if (window.location.search.includes('autostart')) {
+      const overlay = document.getElementById('start-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+  </script>
+
+  <!-- Viewport Stage -->
+  <div id="viewport" class="viewport">
+    
+    <!-- Authentic Panoramic Office Container -->
+    <div id="office-stage" class="office-stage">
+      
+      <!-- Background Office Render (Fan / Light States) -->
+      <img id="office-bg" class="office-bg" src="assets/office/office_boys.png" alt="Office Background">
+
+      <!-- Left Door Animated Overlay -->
+      <div id="left-door-container" class="door-container left-door-container">
+        <img id="left-door-img" class="door-frame-img" src="assets/doors/91.png" alt="Left Door">
+      </div>
+
+      <!-- Right Door Animated Overlay -->
+      <div id="right-door-container" class="door-container right-door-container">
+        <img id="right-door-img" class="door-frame-img" src="assets/doors/103.png" alt="Right Door">
+      </div>
+
+      <!-- Left Wall Control Panel -->
+      <div class="wall-panel left-wall-panel">
+        <button id="btn-left-door" class="wall-btn btn-door-toggle" title="Left Door (Q)">
+          <span class="btn-led red-led" id="led-left-door"></span>
+          <span class="btn-label">DOOR</span>
+        </button>
+        <button id="btn-left-light" class="wall-btn btn-light-toggle" title="Left Light (A)">
+          <span class="btn-led white-led" id="led-left-light"></span>
+          <span class="btn-label">LIGHT</span>
+        </button>
+      </div>
+
+      <!-- Right Wall Control Panel -->
+      <div class="wall-panel right-wall-panel">
+        <button id="btn-right-door" class="wall-btn btn-door-toggle" title="Right Door (E)">
+          <span class="btn-led red-led" id="led-right-door"></span>
+          <span class="btn-label">DOOR</span>
+        </button>
+        <button id="btn-right-light" class="wall-btn btn-light-toggle" title="Right Light (D)">
+          <span class="btn-led white-led" id="led-right-light"></span>
+          <span class="btn-label">LIGHT</span>
+        </button>
+      </div>
+
+      <!-- Friend Doorway Silhouette Containers (For when Trevor, Chris, Spencer, Daxon appear!) -->
+      <div id="friend-left-doorway" class="friend-slot friend-left"></div>
+      <div id="friend-right-doorway" class="friend-slot friend-right"></div>
+
+    </div><!-- #office-stage -->
+
+    <!-- Authentic Top-Right Time & Night Display -->
+    <div class="hud-clock">
+      <div id="hud-time" class="time-text">12 AM</div>
+      <div id="hud-night" class="night-text">Night 1</div>
+    </div>
+
+    <!-- Authentic Bottom-Left Power & Usage Meter -->
+    <div class="hud-power">
+      <div class="power-line">
+        <span>Power left: </span>
+        <span id="power-percent">99%</span>
+      </div>
+      <div class="usage-line">
+        <span>Usage: </span>
+        <div id="usage-bars" class="usage-bars">
+          <span class="usage-pip active-green"></span>
+          <span class="usage-pip"></span>
+          <span class="usage-pip"></span>
+          <span class="usage-pip"></span>
+          <span class="usage-pip"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authentic FNAF 1 Camera Monitor Tablet Screen -->
+    <div id="camera-monitor" class="camera-monitor hidden">
+      <!-- Camera Viewport Screen -->
+      <div id="cam-screen" class="cam-screen">
+        <!-- Active Camera Room Image (Pans smoothly like authentic FNAF 1) -->
+        <div id="cam-feed-container" class="cam-feed-container">
+          <img id="cam-feed-img" class="cam-feed-img" src="assets/cameras/feeds/cam1a.png" alt="Camera Feed">
+        </div>
+
+        <!-- Real CRT Static Noise Loop Overlay (Procedural Canvas - Zero Decode Flash) -->
+        <canvas id="cam-static-canvas" class="cam-static-canvas" width="320" height="180"></canvas>
+
+        <!-- Dark Kitchen / Audio Only Overlay (CAM 6) -->
+        <div id="cam-kitchen-overlay" class="cam-special-overlay hidden">
+          <div class="kitchen-glitch-text">CAMERA DISABLED</div>
+          <div class="kitchen-subtext">- AUDIO ONLY -</div>
+          <div class="kitchen-audio-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="kitchen-note">POTS & PANS RATTLING IN THE DARK...</div>
+        </div>
+
+        <!-- Top Left HUD: REC and Room Name -->
+        <div class="cam-hud-topleft">
+          <div class="cam-rec-indicator">
+            <span class="rec-dot">●</span>
+            <span class="rec-text">REC</span>
+          </div>
+          <div id="cam-title-code" class="cam-title-code">CAM 1A</div>
+          <div id="cam-title-name" class="cam-title-name">Show Stage</div>
+        </div>
+
+        <!-- Bottom Right HUD: Authentic Camera Map & Buttons -->
+        <div class="cam-map-wrapper">
+          <img class="cam-map-blueprint" src="assets/cameras/map_complete.png" alt="Pizzeria Map">
+          <div class="you-indicator" style="left: 310px; top: 350px;" title="YOU">
+            <span class="you-pulse"></span>
+            <span class="you-text">YOU</span>
+          </div>
+
+          <!-- 11 Interactive Camera Buttons (Mapped to Exact Pixel Coordinates) -->
+          <button class="cam-btn active" data-cam="1A" style="left: 258px; top: 39px;">
+            <span class="btn-text">CAM 1A</span>
+          </button>
+          <button class="cam-btn" data-cam="1B" style="left: 238px; top: 95px;">
+            <span class="btn-text">CAM 1B</span>
+          </button>
+          <button class="cam-btn" data-cam="5" style="left: 132px; top: 122px;">
+            <span class="btn-text">CAM 5</span>
+          </button>
+          <button class="cam-btn" data-cam="7" style="left: 470px; top: 123px;">
+            <span class="btn-text">CAM 7</span>
+          </button>
+          <button class="cam-btn" data-cam="1C" style="left: 206px; top: 173px;">
+            <span class="btn-text">CAM 1C</span>
+          </button>
+          <button class="cam-btn" data-cam="6" style="left: 461px; top: 254px;">
+            <span class="btn-text">CAM 6</span>
+          </button>
+          <button class="cam-btn" data-cam="3" style="left: 174px; top: 271px;">
+            <span class="btn-text">CAM 3</span>
+          </button>
+          <button class="cam-btn" data-cam="2A" style="left: 258px; top: 289px;">
+            <span class="btn-text">CAM 2A</span>
+          </button>
+          <button class="cam-btn" data-cam="4A" style="left: 364px; top: 290px;">
+            <span class="btn-text">CAM 4A</span>
+          </button>
+          <button class="cam-btn" data-cam="2B" style="left: 258px; top: 329px;">
+            <span class="btn-text">CAM 2B</span>
+          </button>
+          <button class="cam-btn" data-cam="4B" style="left: 364px; top: 330px;">
+            <span class="btn-text">CAM 4B</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tablet Animation Flip Frame Overlay -->
+      <div id="cam-flip-anim" class="cam-flip-anim hidden">
+        <img id="cam-flip-img" src="assets/cameras/tablet/frame_0.png" alt="Flip Animation">
+      </div>
+    </div>
+
+    <!-- Jumpscare Overlay Container -->
+    <div id="jumpscare-overlay" class="jumpscare-overlay hidden">
+      <img id="jumpscare-img" src="assets/friends/trevor_death_stare.jpg" alt="Jumpscare">
+    </div>
+
+    <!-- Phone Guy Call Widget (Top Left) -->
+    <div id="phone-call-widget" class="phone-call-widget hidden">
+      <div class="phone-rec-dot"></div>
+      <div class="phone-text">PHONE RECORDING (12:00 AM)</div>
+      <button id="btn-mute-call" class="phone-mute-btn">MUTE CALL</button>
+    </div>
+
+    <!-- Creepy Hallucination & IT'S ME Overlay -->
+    <div id="hallucination-overlay" class="hallucination-overlay hidden">
+      <img id="hallucination-img" src="assets/friends/chris_seahawks_scream.jpg" alt="Hallucination">
+      <div class="hallucination-text">IT'S ME</div>
+    </div>
+
+    <!-- Authentic 6:00 AM Win Overlay -->
+    <div id="win-overlay" class="win-overlay hidden">
+      <div class="win-modal-box">
+        <div class="win-clock-display">
+          <span id="win-clock-digit" class="win-digit">5 AM</span>
+        </div>
+        <div id="win-details" class="win-details hidden">
+          <h2 class="win-title">NIGHT COMPLETED!</h2>
+          <div class="win-stars">★★★</div>
+          <p id="win-sub" class="win-sub">You survived Night 1</p>
+          <div class="win-btn-group">
+            <button id="btn-next-night" class="win-btn-primary">NEXT NIGHT</button>
+            <button id="btn-open-custom-from-win" class="win-btn-secondary">CUSTOM NIGHT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Night (Night 7 / AI Select) Modal -->
+    <div id="custom-night-modal" class="custom-night-modal hidden">
+      <div class="custom-night-box">
+        <h1 class="custom-title">CUSTOM NIGHT</h1>
+        <p class="custom-subtitle">SET A.I. DIFFICULTY (0 - 20)</p>
+        
+        <div class="custom-grid">
+          <!-- Spencer -->
+          <div class="custom-card">
+            <img src="assets/friends/spencer_pucker.jpg" alt="Spencer">
+            <div class="custom-card-name">SPENCER</div>
+            <div class="custom-stepper">
+              <button class="step-btn" data-friend="spencer" data-dir="-1">&lt;</button>
+              <span id="ai-num-spencer" class="step-val">2</span>
+              <button class="step-btn" data-friend="spencer" data-dir="1">&gt;</button>
+            </div>
+          </div>
+          <!-- Chris -->
+          <div class="custom-card">
+            <img src="assets/friends/chris_stare_glasses.jpg" alt="Chris">
+            <div class="custom-card-name">CHRIS</div>
+            <div class="custom-stepper">
+              <button class="step-btn" data-friend="chris" data-dir="-1">&lt;</button>
+              <span id="ai-num-chris" class="step-val">2</span>
+              <button class="step-btn" data-friend="chris" data-dir="1">&gt;</button>
+            </div>
+          </div>
+          <!-- Trevor -->
+          <div class="custom-card">
+            <img src="assets/friends/trevor_sunglasses_pose.jpg" alt="Trevor">
+            <div class="custom-card-name">TREVOR</div>
+            <div class="custom-stepper">
+              <button class="step-btn" data-friend="trevor" data-dir="-1">&lt;</button>
+              <span id="ai-num-trevor" class="step-val">2</span>
+              <button class="step-btn" data-friend="trevor" data-dir="1">&gt;</button>
+            </div>
+          </div>
+          <!-- Daxon -->
+          <div class="custom-card">
+            <img src="assets/friends/daxon_goofy_grin.jpg" alt="Daxon">
+            <div class="custom-card-name">DAXON</div>
+            <div class="custom-stepper">
+              <button class="step-btn" data-friend="daxon" data-dir="-1">&lt;</button>
+              <span id="ai-num-daxon" class="step-val">2</span>
+              <button class="step-btn" data-friend="daxon" data-dir="1">&gt;</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="custom-actions">
+          <button id="btn-20-20-mode" class="custom-btn danger">20/20/20/20 MODE</button>
+          <button id="btn-start-custom-night" class="custom-btn start">READY</button>
+          <button id="btn-close-custom-modal" class="custom-btn">CLOSE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Authentic Camera Monitor Hover / Flip Bar at Bottom -->
+    <div id="cam-monitor-bar" class="cam-monitor-bar">
+      <div class="cam-bar-handle">
+        <span class="cam-bar-icon">▲</span>
+        <span class="cam-bar-text">CAMERA MONITOR</span>
+      </div>
+    </div>
+
+    <!-- Sleek minimal key hints (unobtrusive, clicks pass through) -->
+    <div class="minimal-controls-bar">
+      <div class="ctrl-chip"><kbd>Q</kbd> Left Door</div>
+      <div class="ctrl-chip"><kbd>A</kbd> Left Light</div>
+      <div class="ctrl-sep">|</div>
+      <div class="ctrl-chip"><kbd>SPACE</kbd> / <kbd>S</kbd> / <kbd>ESC</kbd> Camera</div>
+      <div class="ctrl-sep">|</div>
+      <div class="ctrl-chip"><kbd>D</kbd> Right Light</div>
+      <div class="ctrl-chip"><kbd>E</kbd> Right Door</div>
+    </div>
+
+  </div><!-- #viewport -->
+
+  <!-- Synchronous Headless Test Priming Script -->
+  <script>
+    (function() {
+      const p = new URLSearchParams(window.location.search);
+
+      const bg = document.getElementById('office-bg');
+      const stage = document.getElementById('office-stage');
+      const ledLeftLight = document.getElementById('led-left-light');
+      const ledRightLight = document.getElementById('led-right-light');
+
+      if (p.get('light') === 'left') {
+        if (ledLeftLight) ledLeftLight.classList.add('active');
+        if (bg) {
+          bg.src = (p.get('who') === 'spencer')
+            ? 'assets/office/office_left_light_spencer.png'
+            : 'assets/office/office_left_light_trevor.png';
+        }
+      } else if (p.get('light') === 'right') {
+        if (ledRightLight) ledRightLight.classList.add('active');
+        if (bg) {
+          bg.src = (p.get('who') === 'chris')
+            ? 'assets/office/office_right_light_chris.png'
+            : 'assets/office/office_right_light_daxon.png';
+        }
+      }
+
+      if (p.get('pan') === 'left') {
+        if (stage) stage.style.transform = 'translate3d(0px, 0, 0)';
+      } else if (p.get('pan') === 'right') {
+        if (stage) stage.style.transform = 'translate3d(-320px, 0, 0)';
+      } else {
+        if (stage) stage.style.transform = 'translate3d(-160px, 0, 0)';
+      }
+
+      if (p.get('cams') === 'open') {
+        const mon = document.getElementById('camera-monitor');
+        const screen = document.getElementById('cam-screen');
+        const flip = document.getElementById('cam-flip-anim');
+        const feedImg = document.getElementById('cam-feed-img');
+        const titleCode = document.getElementById('cam-title-code');
+        const titleName = document.getElementById('cam-title-name');
+        const kitchenOverlay = document.getElementById('cam-kitchen-overlay');
+        const camBtns = document.querySelectorAll('.cam-btn');
+
+        if (mon) mon.classList.remove('hidden');
+        if (screen) screen.classList.remove('hidden');
+        if (flip) flip.classList.add('hidden');
+
+        const cam = p.get('cam') || '1A';
+        if (titleCode) titleCode.textContent = 'CAM ' + cam;
+
+        const roomNames = {
+          '1A': 'Show Stage', '1B': 'Dining Area', '1C': 'Pirate Cove',
+          '2A': 'West Hall', '2B': 'W. Hall Corner', '3': 'Supply Closet',
+          '4A': 'East Hall', '4B': 'E. Hall Corner', '5': 'Backstage',
+          '6': 'Kitchen', '7': 'Restrooms'
+        };
+        if (titleName) titleName.textContent = roomNames[cam] || '';
+
+        camBtns.forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-cam') === cam);
+        });
+
+        if (cam === '6') {
+          if (kitchenOverlay) kitchenOverlay.classList.remove('hidden');
+          if (feedImg) feedImg.src = 'assets/cameras/feeds/cam6.png';
+        } else {
+          if (kitchenOverlay) kitchenOverlay.classList.add('hidden');
+          let src = 'assets/cameras/feeds/cam1a_spencer_chris_daxon.png';
+          if (cam === '1B') src = 'assets/cameras/feeds/cam1b_spencer.png';
+          else if (cam === '1C') {
+            const st = p.get('stage') || '1';
+            src = `assets/cameras/feeds/cam1c_stage${st}.png`;
+          }
+          else if (cam === '2A') src = 'assets/cameras/feeds/cam2a_trevor.png';
+          else if (cam === '2B') src = 'assets/cameras/feeds/cam2b_spencer.png';
+          else if (cam === '3') src = 'assets/cameras/feeds/cam3_spencer.png';
+          else if (cam === '4A') src = 'assets/cameras/feeds/cam4a_daxon.png';
+          else if (cam === '4B') src = 'assets/cameras/feeds/cam4b_daxon.png';
+          else if (cam === '5') src = 'assets/cameras/feeds/cam5_spencer.png';
+          else if (cam === '7') src = 'assets/cameras/feeds/cam7_daxon.png';
+
+          if (feedImg) feedImg.src = src;
+        }
+
+        const camBar = document.getElementById('cam-monitor-bar');
+        if (camBar) {
+          camBar.classList.add('open');
+          const icon = camBar.querySelector('.cam-bar-icon');
+          if (icon) icon.textContent = '▼';
+          const text = camBar.querySelector('.cam-bar-text');
+          if (text) text.textContent = 'PUT DOWN MONITOR';
+        }
+      }
+
+      if (p.get('custom') === '1') {
+        const startOverlay = document.getElementById('start-overlay');
+        const customModal = document.getElementById('custom-night-modal');
+        if (startOverlay) startOverlay.classList.add('hidden');
+        if (customModal) customModal.classList.remove('hidden');
+      }
+
+      window.addEventListener('load', () => {
+        if (!window.game) return;
+        if (p.get('win') === '1') {
+          if (!window.game.isRunning) window.game.startGame();
+          setTimeout(() => window.game.triggerWin(), 300);
+        } else if (p.get('powerout') === '1') {
+          if (!window.game.isRunning) window.game.startGame();
+          setTimeout(() => window.game.triggerPowerOutage(), 300);
+        } else if (p.get('hallucinate') === '1') {
+          if (!window.game.isRunning) window.game.startGame();
+          setTimeout(() => window.game.triggerHallucination(), 400);
+        } else if (p.get('jammed') === 'left') {
+          if (window.game.office) window.game.office.setJammed('left', true);
+        } else if (p.get('jammed') === 'right') {
+          if (window.game.office) window.game.office.setJammed('right', true);
+        }
+      });
+    })();
+  </script>
+
+  <!-- Game Scripts -->
+  <script src="src/audio.js"></script>
+  <script src="src/office.js"></script>
+  <script src="src/camera.js"></script>
+  <script src="src/game.js"></script>
+</body>
+</html>
