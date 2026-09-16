@@ -218,6 +218,7 @@ body {
   display: none; /* Shown when door is active */
   z-index: 10;
   pointer-events: none;
+  overflow: hidden; /* Clips sprite sheet to exact door aperture */
   will-change: transform;
   transform: translateZ(0);
 }
@@ -237,12 +238,23 @@ body {
 }
 
 .door-frame-img {
-  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
-  object-fit: fill;
+  max-width: none;
   display: block;
-  will-change: contents;
-  transform: translateZ(0);
+  pointer-events: none;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+.left-door-sprite {
+  width: 1200%; /* 12 frames across */
+}
+
+.right-door-sprite {
+  width: 1600%; /* 16 frames across */
 }
 
 /* ==========================================================================
@@ -589,6 +601,8 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: opacity 0.08s ease-out;
+  will-change: opacity;
 }
 
 /* Genuine CRT Static Noise Overlay (Procedural Canvas) */

@@ -10,6 +10,8 @@
   <meta name="theme-color" content="#000000">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/friends/trevor_sunglasses_pose.jpg">
+  <link rel="preload" as="image" href="assets/doors/door_left_sheet.png">
+  <link rel="preload" as="image" href="assets/doors/door_right_sheet.png">
   <title>Five Nights at Friends</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,12 +58,12 @@
 
       <!-- Left Door Animated Overlay -->
       <div id="left-door-container" class="door-container left-door-container">
-        <img id="left-door-img" class="door-frame-img" src="assets/doors/91.png" alt="Left Door">
+        <img id="left-door-img" class="door-frame-img left-door-sprite" src="assets/doors/door_left_sheet.png" alt="Left Door">
       </div>
 
       <!-- Right Door Animated Overlay -->
       <div id="right-door-container" class="door-container right-door-container">
-        <img id="right-door-img" class="door-frame-img" src="assets/doors/103.png" alt="Right Door">
+        <img id="right-door-img" class="door-frame-img right-door-sprite" src="assets/doors/door_right_sheet.png" alt="Right Door">
       </div>
 
       <!-- Left Wall Control Panel -->

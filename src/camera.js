@@ -66,19 +66,98 @@ class CameraController {
 
     this.kitchenAudio = null;
     this.lastPanTime = performance.now();
+    this.camSwitchId = 0;
+    this.currentFeedSrc = '';
+    this.staticBurstTimer = null;
 
+    this.preloadAllFeeds();
     this.setupEvents();
     this.startStaticLoop();
     this.startPanLoop();
   }
 
+  preloadAllFeeds() {
+    const feeds = [
+      'assets/cameras/feeds/cam1a_spencer_chris_daxon.png',
+      'assets/cameras/feeds/cam1a_chris_daxon.png',
+      'assets/cameras/feeds/cam1a_spencer_daxon.png',
+      'assets/cameras/feeds/cam1a_spencer_chris.png',
+      'assets/cameras/feeds/cam1a_chris.png',
+      'assets/cameras/feeds/cam1a_spencer.png',
+      'assets/cameras/feeds/cam1a_daxon.png',
+      'assets/cameras/feeds/cam1a_empty.png',
+      'assets/cameras/feeds/cam1a.png',
+      'assets/cameras/feeds/cam1b_spencer_chris.png',
+      'assets/cameras/feeds/cam1b_spencer.png',
+      'assets/cameras/feeds/cam1b_chris.png',
+      'assets/cameras/feeds/cam1b_daxon.png',
+      'assets/cameras/feeds/cam1b_empty.png',
+      'assets/cameras/feeds/cam1c_stage1.png',
+      'assets/cameras/feeds/cam1c_stage2.png',
+      'assets/cameras/feeds/cam1c_stage2_blue_eyes.png',
+      'assets/cameras/feeds/cam1c_stage3.png',
+      'assets/cameras/feeds/cam1c_stage4.png',
+      'assets/cameras/feeds/cam2a_trevor.png',
+      'assets/cameras/feeds/cam2a_trevor_blue_eyes.png',
+      'assets/cameras/feeds/cam2a_empty.png',
+      'assets/cameras/feeds/cam2b_spencer.png',
+      'assets/cameras/feeds/cam2b_empty.png',
+      'assets/cameras/feeds/cam3_spencer_chocolate.png',
+      'assets/cameras/feeds/cam3_spencer.png',
+      'assets/cameras/feeds/cam3_empty.png',
+      'assets/cameras/feeds/cam5_bunny.png',
+      'assets/cameras/feeds/cam5_spencer.png',
+      'assets/cameras/feeds/cam5_empty.png',
+      'assets/cameras/feeds/cam6.png',
+      'assets/cameras/feeds/cam7_daxon.png',
+      'assets/cameras/feeds/cam7_empty.png',
+      'assets/cameras/feeds/cam4a_daxon_smirk.png',
+      'assets/cameras/feeds/cam4a_chris.png',
+      'assets/cameras/feeds/cam4a_empty.png',
+      'assets/cameras/feeds/cam4b_daxon.png',
+      'assets/cameras/feeds/cam4b_chris_stare.png',
+      'assets/cameras/feeds/cam4b_empty.png'
+    ];
+    this.preloadedImages = {};
+    feeds.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      this.preloadedImages[src] = img;
+    });
+  }
+
   setupEvents() {
-    // Interactive Camera Buttons
+    // Interactive Camera Buttons with touch and click optimization
+    let lastCamTouchTime = 0;
     this.camButtons.forEach(btn => {
+      let touchStartX = 0;
+      let touchStartY = 0;
+
+      btn.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      btn.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches[0]) {
+          const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+          const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+          if (dx > 25 || dy > 25) return; // Ignore drag gesture
+        }
+        lastCamTouchTime = Date.now();
+        e.stopPropagation();
+        e.preventDefault();
+        const camCode = btn.getAttribute('data-cam');
+        if (camCode) this.switchCamera(camCode);
+      }, { passive: false });
+
       btn.addEventListener('click', (e) => {
+        if (Date.now() - lastCamTouchTime < 450) return; // Prevent emulated click after touch
         e.stopPropagation();
         const camCode = btn.getAttribute('data-cam');
-        this.switchCamera(camCode);
+        if (camCode) this.switchCamera(camCode);
       });
     });
 
@@ -278,8 +357,8 @@ class CameraController {
     // Play camera button blip
     window.soundEngine.play('blip', 0.8);
 
-    // Trigger brief static glitch
-    this.triggerStaticBurst();
+    // Trigger authentic brief CRT static glitch
+    this.triggerStaticBurst(200);
 
     this.activeCam = camCode;
 
@@ -297,10 +376,10 @@ class CameraController {
     this.titleNameEl.textContent = this.roomNames[camCode] || '';
 
     // Update Feed Image
-    this.updateFeedDisplay();
+    this.updateFeedDisplay(force);
   }
 
-  updateFeedDisplay() {
+  updateFeedDisplay(force = false) {
     const cam = this.activeCam;
 
     // Handle CAM 6 (Kitchen: CAMERA DISABLED - AUDIO ONLY)
@@ -312,7 +391,9 @@ class CameraController {
       } else {
         this.stopKitchenAudio();
       }
-      this.camFeedImg.src = 'assets/cameras/feeds/cam6.png';
+      this.currentFeedSrc = 'assets/cameras/feeds/cam6.png';
+      this.camFeedImg.src = this.currentFeedSrc;
+      this.camFeedImg.style.opacity = '1';
       return;
     } else {
       this.kitchenOverlay.classList.add('hidden');
@@ -449,7 +530,35 @@ class CameraController {
         break;
     }
 
-    this.camFeedImg.src = feedSrc;
+    if (this.currentFeedSrc === feedSrc && !force) {
+      return;
+    }
+
+    const currentSwitchId = ++this.camSwitchId;
+
+    // Immediately hide previous room so it NEVER lingers while new room is loading/decoding
+    if (this.currentFeedSrc !== feedSrc) {
+      this.camFeedImg.style.opacity = '0';
+    }
+
+    const targetSrc = feedSrc;
+    const pre = (this.preloadedImages && this.preloadedImages[targetSrc]) ? this.preloadedImages[targetSrc] : new Image();
+    if (!pre.src) pre.src = targetSrc;
+
+    const commitFeed = () => {
+      // Discard stale asynchronous load if player switched cameras again
+      if (this.camSwitchId !== currentSwitchId) return;
+      this.currentFeedSrc = targetSrc;
+      this.camFeedImg.src = targetSrc;
+      this.camFeedImg.style.opacity = '1';
+    };
+
+    if (pre.complete && pre.naturalWidth > 0) {
+      commitFeed();
+    } else {
+      pre.onload = commitFeed;
+      pre.onerror = commitFeed;
+    }
   }
 
   startKitchenAudio() {
@@ -470,15 +579,16 @@ class CameraController {
     }
   }
 
-  triggerStaticBurst() {
+  triggerStaticBurst(duration = 180) {
     const target = this.camStaticCanvas || this.camStaticImg;
     if (target) {
-      target.style.opacity = '0.75';
-      setTimeout(() => {
+      target.style.opacity = '0.85';
+      if (this.staticBurstTimer) clearTimeout(this.staticBurstTimer);
+      this.staticBurstTimer = setTimeout(() => {
         if (target) {
           target.style.opacity = '0.16';
         }
-      }, 140);
+      }, duration);
     }
   }
 
@@ -522,7 +632,8 @@ class CameraController {
       this.closeMonitor();
     }
     this.activeCam = '1A';
-    this.updateFeedDisplay();
+    this.currentFeedSrc = '';
+    this.updateFeedDisplay(true);
   }
 
   startPanLoop() {

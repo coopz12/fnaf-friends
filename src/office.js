@@ -49,33 +49,22 @@ class OfficeController {
     this.leftLightPath = 'assets/office/office_left_light.png';
     this.rightLightPath = 'assets/office/office_right_light.png';
 
-    // Door animation frame lists & pre-loaded Image cache for zero-lag hardware playback
-    this.leftDoorFrames = [];
-    this.leftDoorImages = [];
-    for (let i = 91; i <= 102; i++) {
-      const path = `assets/doors/${i}.png`;
-      this.leftDoorFrames.push(path);
-      const img = new Image();
-      img.src = path;
-      if (img.decode) img.decode().catch(() => {});
-      this.leftDoorImages.push(img);
-    }
-
-    this.rightDoorFrames = [];
-    this.rightDoorImages = [];
-    for (let i = 103; i <= 118; i++) {
-      const path = `assets/doors/${i}.png`;
-      this.rightDoorFrames.push(path);
-      const img = new Image();
-      img.src = path;
-      if (img.decode) img.decode().catch(() => {});
-      this.rightDoorImages.push(img);
-    }
-
+    // Door Sprite Sheet Configurations for 100% glitch-free GPU playback
+    this.leftDoorTotalFrames = 12;
+    this.rightDoorTotalFrames = 16;
     this.leftDoorCurrentIndex = -1;
     this.rightDoorCurrentIndex = -1;
     this.leftDoorAnimId = null;
     this.rightDoorAnimId = null;
+
+    // Preload sprite sheets in memory immediately
+    const preloadLeft = new Image();
+    preloadLeft.src = 'assets/doors/door_left_sheet.png';
+    if (preloadLeft.decode) preloadLeft.decode().catch(() => {});
+
+    const preloadRight = new Image();
+    preloadRight.src = 'assets/doors/door_right_sheet.png';
+    if (preloadRight.decode) preloadRight.decode().catch(() => {});
 
     // Set initial rock-solid background
     this.bgImg.src = this.baseOfficePath;
@@ -238,8 +227,8 @@ class OfficeController {
     const isLeft = (side === 'left');
     const container = isLeft ? this.leftDoorContainer : this.rightDoorContainer;
     const img = isLeft ? this.leftDoorImg : this.rightDoorImg;
-    const frames = isLeft ? this.leftDoorFrames : this.rightDoorFrames;
-    const maxIdx = frames.length - 1;
+    const totalFrames = isLeft ? this.leftDoorTotalFrames : this.rightDoorTotalFrames;
+    const maxIdx = totalFrames - 1;
 
     // Cancel existing animation loop if running
     if (isLeft && this.leftDoorAnimId) {
@@ -260,10 +249,15 @@ class OfficeController {
     const targetIdx = isClosing ? maxIdx : 0;
     const step = isClosing ? 1 : -1;
 
-    // Apply first frame immediately for 0ms visual latency
-    img.src = frames[currentIdx];
-    if (isLeft) this.leftDoorCurrentIndex = currentIdx;
-    else this.rightDoorCurrentIndex = currentIdx;
+    // Shift sprite sheet with 0ms visual latency via GPU transform
+    const setFrame = (idx) => {
+      const pct = (idx * (100 / totalFrames)).toFixed(4);
+      img.style.transform = `translate3d(-${pct}%, 0, 0)`;
+      if (isLeft) this.leftDoorCurrentIndex = idx;
+      else this.rightDoorCurrentIndex = idx;
+    };
+
+    setFrame(currentIdx);
 
     if (currentIdx === targetIdx) {
       if (!isClosing) {
@@ -275,16 +269,14 @@ class OfficeController {
     }
 
     let lastTime = performance.now();
-    const frameInterval = 22; // ~45fps, fast, snappy, butter-smooth
+    const frameInterval = 22; // ~45fps, authentic snappy speed
 
     const stepFrame = (now) => {
       const elapsed = now - lastTime;
       if (elapsed >= frameInterval) {
         currentIdx += step;
         currentIdx = Math.max(0, Math.min(maxIdx, currentIdx));
-        img.src = frames[currentIdx];
-        if (isLeft) this.leftDoorCurrentIndex = currentIdx;
-        else this.rightDoorCurrentIndex = currentIdx;
+        setFrame(currentIdx);
         lastTime = now;
 
         if (currentIdx === targetIdx) {
@@ -450,6 +442,8 @@ class OfficeController {
     if (this.btnRightLight) this.btnRightLight.classList.remove('jammed');
     if (this.leftDoorContainer) this.leftDoorContainer.classList.remove('active');
     if (this.rightDoorContainer) this.rightDoorContainer.classList.remove('active');
+    if (this.leftDoorImg) this.leftDoorImg.style.transform = 'translate3d(0, 0, 0)';
+    if (this.rightDoorImg) this.rightDoorImg.style.transform = 'translate3d(0, 0, 0)';
     if (this.stage) this.stage.style.filter = 'none';
     if (this.bgImg) this.bgImg.src = this.baseOfficePath;
     this.updateUsageDisplay();
