@@ -218,6 +218,8 @@ body {
   display: none; /* Shown when door is active */
   z-index: 10;
   pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .door-container.active {
@@ -239,6 +241,8 @@ body {
   height: 100%;
   object-fit: fill;
   display: block;
+  will-change: contents;
+  transform: translateZ(0);
 }
 
 /* ==========================================================================

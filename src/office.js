@@ -49,15 +49,33 @@ class OfficeController {
     this.leftLightPath = 'assets/office/office_left_light.png';
     this.rightLightPath = 'assets/office/office_right_light.png';
 
-    // Door animation frame lists
+    // Door animation frame lists & pre-loaded Image cache for zero-lag hardware playback
     this.leftDoorFrames = [];
-    for (let i = 91; i <= 102; i++) this.leftDoorFrames.push(`assets/doors/${i}.png`);
+    this.leftDoorImages = [];
+    for (let i = 91; i <= 102; i++) {
+      const path = `assets/doors/${i}.png`;
+      this.leftDoorFrames.push(path);
+      const img = new Image();
+      img.src = path;
+      if (img.decode) img.decode().catch(() => {});
+      this.leftDoorImages.push(img);
+    }
 
     this.rightDoorFrames = [];
-    for (let i = 103; i <= 118; i++) this.rightDoorFrames.push(`assets/doors/${i}.png`);
+    this.rightDoorImages = [];
+    for (let i = 103; i <= 118; i++) {
+      const path = `assets/doors/${i}.png`;
+      this.rightDoorFrames.push(path);
+      const img = new Image();
+      img.src = path;
+      if (img.decode) img.decode().catch(() => {});
+      this.rightDoorImages.push(img);
+    }
 
-    this.leftDoorAnimTimer = null;
-    this.rightDoorAnimTimer = null;
+    this.leftDoorCurrentIndex = -1;
+    this.rightDoorCurrentIndex = -1;
+    this.leftDoorAnimId = null;
+    this.rightDoorAnimId = null;
 
     // Set initial rock-solid background
     this.bgImg.src = this.baseOfficePath;
@@ -182,13 +200,13 @@ class OfficeController {
 
     if (this.leftDoorClosed) {
       window.soundEngine.playDoorSlam();
-      this.playDoorAnimation(this.leftDoorContainer, this.leftDoorImg, this.leftDoorFrames, true);
+      this.playDoorAnimation('left', true);
       if (this.game && this.game.onDoorClosed) {
         this.game.onDoorClosed('left');
       }
     } else {
       window.soundEngine.playDoorOpen();
-      this.playDoorAnimation(this.leftDoorContainer, this.leftDoorImg, this.leftDoorFrames, false);
+      this.playDoorAnimation('left', false);
     }
 
     this.updateUsageDisplay();
@@ -204,41 +222,89 @@ class OfficeController {
 
     if (this.rightDoorClosed) {
       window.soundEngine.playDoorSlam();
-      this.playDoorAnimation(this.rightDoorContainer, this.rightDoorImg, this.rightDoorFrames, true);
+      this.playDoorAnimation('right', true);
       if (this.game && this.game.onDoorClosed) {
         this.game.onDoorClosed('right');
       }
     } else {
       window.soundEngine.playDoorOpen();
-      this.playDoorAnimation(this.rightDoorContainer, this.rightDoorImg, this.rightDoorFrames, false);
+      this.playDoorAnimation('right', false);
     }
 
     this.updateUsageDisplay();
   }
 
-  playDoorAnimation(container, img, frames, isClosing) {
+  playDoorAnimation(side, isClosing) {
+    const isLeft = (side === 'left');
+    const container = isLeft ? this.leftDoorContainer : this.rightDoorContainer;
+    const img = isLeft ? this.leftDoorImg : this.rightDoorImg;
+    const frames = isLeft ? this.leftDoorFrames : this.rightDoorFrames;
+    const maxIdx = frames.length - 1;
+
+    // Cancel existing animation loop if running
+    if (isLeft && this.leftDoorAnimId) {
+      cancelAnimationFrame(this.leftDoorAnimId);
+      this.leftDoorAnimId = null;
+    } else if (!isLeft && this.rightDoorAnimId) {
+      cancelAnimationFrame(this.rightDoorAnimId);
+      this.rightDoorAnimId = null;
+    }
+
     container.classList.add('active');
-    let idx = isClosing ? 0 : frames.length - 1;
-    const targetIdx = isClosing ? frames.length - 1 : 0;
+
+    // Smooth continuation from current position if interrupted
+    let currentIdx = isLeft ? this.leftDoorCurrentIndex : this.rightDoorCurrentIndex;
+    if (currentIdx < 0) {
+      currentIdx = isClosing ? 0 : maxIdx;
+    }
+    const targetIdx = isClosing ? maxIdx : 0;
     const step = isClosing ? 1 : -1;
 
-    if (container === this.leftDoorContainer && this.leftDoorAnimTimer) clearInterval(this.leftDoorAnimTimer);
-    if (container === this.rightDoorContainer && this.rightDoorAnimTimer) clearInterval(this.rightDoorAnimTimer);
+    // Apply first frame immediately for 0ms visual latency
+    img.src = frames[currentIdx];
+    if (isLeft) this.leftDoorCurrentIndex = currentIdx;
+    else this.rightDoorCurrentIndex = currentIdx;
 
-    const timer = setInterval(() => {
-      img.src = frames[idx];
-      if (idx === targetIdx) {
-        clearInterval(timer);
-        if (!isClosing) {
-          container.classList.remove('active');
-        }
-      } else {
-        idx += step;
+    if (currentIdx === targetIdx) {
+      if (!isClosing) {
+        container.classList.remove('active');
+        if (isLeft) this.leftDoorCurrentIndex = -1;
+        else this.rightDoorCurrentIndex = -1;
       }
-    }, 28);
+      return;
+    }
 
-    if (container === this.leftDoorContainer) this.leftDoorAnimTimer = timer;
-    else this.rightDoorAnimTimer = timer;
+    let lastTime = performance.now();
+    const frameInterval = 22; // ~45fps, fast, snappy, butter-smooth
+
+    const stepFrame = (now) => {
+      const elapsed = now - lastTime;
+      if (elapsed >= frameInterval) {
+        currentIdx += step;
+        currentIdx = Math.max(0, Math.min(maxIdx, currentIdx));
+        img.src = frames[currentIdx];
+        if (isLeft) this.leftDoorCurrentIndex = currentIdx;
+        else this.rightDoorCurrentIndex = currentIdx;
+        lastTime = now;
+
+        if (currentIdx === targetIdx) {
+          if (!isClosing) {
+            container.classList.remove('active');
+            if (isLeft) this.leftDoorCurrentIndex = -1;
+            else this.rightDoorCurrentIndex = -1;
+          }
+          if (isLeft) this.leftDoorAnimId = null;
+          else this.rightDoorAnimId = null;
+          return;
+        }
+      }
+
+      if (isLeft) this.leftDoorAnimId = requestAnimationFrame(stepFrame);
+      else this.rightDoorAnimId = requestAnimationFrame(stepFrame);
+    };
+
+    if (isLeft) this.leftDoorAnimId = requestAnimationFrame(stepFrame);
+    else this.rightDoorAnimId = requestAnimationFrame(stepFrame);
   }
 
   /* ==========================================================================
@@ -368,6 +434,12 @@ class OfficeController {
     this.rightLightOn = false;
     this.leftJammed = false;
     this.rightJammed = false;
+    if (this.leftDoorAnimId) cancelAnimationFrame(this.leftDoorAnimId);
+    if (this.rightDoorAnimId) cancelAnimationFrame(this.rightDoorAnimId);
+    this.leftDoorAnimId = null;
+    this.rightDoorAnimId = null;
+    this.leftDoorCurrentIndex = -1;
+    this.rightDoorCurrentIndex = -1;
     if (this.ledLeftDoor) this.ledLeftDoor.classList.remove('active');
     if (this.ledRightDoor) this.ledRightDoor.classList.remove('active');
     if (this.ledLeftLight) this.ledLeftLight.classList.remove('active');
