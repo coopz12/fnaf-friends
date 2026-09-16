@@ -98,6 +98,41 @@ class GameManager {
       this.startGame();
     });
 
+    // Fullscreen Toggles (Start Modal & In-Game HUD)
+    const startFsBtn = document.getElementById('start-fs-btn');
+    const hudFsBtn = document.getElementById('btn-fullscreen');
+
+    const toggleFs = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const doc = document;
+      const docEl = doc.documentElement;
+      const isFs = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+      if (!isFs) {
+        if (docEl.requestFullscreen) docEl.requestFullscreen().catch(() => {});
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        else if (docEl.mozRequestFullScreen) docEl.mozRequestFullScreen();
+        else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+        window.scrollTo(0, 1);
+      } else {
+        if (doc.exitFullscreen) doc.exitFullscreen().catch(() => {});
+        else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen();
+        else if (doc.mozCancelFullScreen) doc.mozCancelFullScreen();
+        else if (doc.msExitFullscreen) doc.msExitFullscreen();
+      }
+    };
+
+    if (startFsBtn) {
+      startFsBtn.addEventListener('click', toggleFs);
+      startFsBtn.addEventListener('touchstart', toggleFs, { passive: false });
+    }
+    if (hudFsBtn) {
+      hudFsBtn.addEventListener('click', toggleFs);
+      hudFsBtn.addEventListener('touchstart', toggleFs, { passive: false });
+    }
+
     // Custom Night Modal openers & closers
     const openCustomBtn = document.getElementById('open-custom-btn');
     const customModal = document.getElementById('custom-night-modal');

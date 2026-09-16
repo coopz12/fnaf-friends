@@ -399,12 +399,11 @@ class CameraController {
         break;
       }
 
-      case '3': { // Supply Closet (Spencer melting chocolate or green shirt, or Dog in Jordans Easter Egg!)
+      case '3': { // Supply Closet (Spencer melting chocolate or green shirt, with subtle Dog in Jordans wall poster)
         if (spencerRoom === '3') {
           feedSrc = (Math.random() < 0.6) ? 'assets/cameras/feeds/cam3_spencer_chocolate.png' : 'assets/cameras/feeds/cam3_spencer.png';
         } else {
-          // Secret Easter Egg: Dog wearing Air Jordans standing between shelves!
-          feedSrc = (Math.random() < 0.25) ? 'assets/cameras/feeds/cam3_dog.png' : 'assets/cameras/feeds/cam3_empty.png';
+          feedSrc = 'assets/cameras/feeds/cam3_empty.png';
         }
         break;
       }
