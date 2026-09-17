@@ -727,6 +727,45 @@ html, body {
   margin-top: 6px;
 }
 
+.hud-skip-btn {
+  margin-top: 10px;
+  background: rgba(14, 20, 16, 0.9);
+  border: 1.5px solid var(--fnaf-green);
+  color: var(--fnaf-green);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  padding: 6px 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 4px;
+  pointer-events: auto;
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.25);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hud-skip-btn:hover {
+  background: var(--fnaf-green);
+  color: #000;
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.85);
+  transform: scale(1.04);
+}
+
+.hud-skip-btn:active {
+  transform: scale(0.96);
+}
+
+.hud-skip-btn .skip-icon {
+  font-size: 14px;
+}
+
 .hud-power {
   position: fixed;
   bottom: 25px;
@@ -2038,6 +2077,16 @@ html, body {
   .night-text {
     font-size: 12px;
     margin-top: 2px;
+  }
+  .hud-skip-btn {
+    font-size: 10px;
+    padding: 3px 8px;
+    margin-top: 3px;
+    letter-spacing: 1px;
+    gap: 4px;
+  }
+  .hud-skip-btn .skip-icon {
+    font-size: 11px;
   }
   .cam-hud-topleft {
     top: max(8px, env(safe-area-inset-top, 0px));

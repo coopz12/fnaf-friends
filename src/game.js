@@ -648,6 +648,31 @@ class GameManager {
       });
     }
 
+    // In-game HUD Skip Night Button
+    const hudSkipBtn = document.getElementById('btn-hud-skip-night');
+    if (hudSkipBtn) {
+      hudSkipBtn.addEventListener('click', () => {
+        this.skipCurrentNight();
+      });
+    }
+
+    // Title Screen Skip Night Button
+    const titleSkipBtn = document.getElementById('title-btn-skip-night');
+    if (titleSkipBtn) {
+      titleSkipBtn.addEventListener('click', () => {
+        this.skipNightOnMenu();
+      });
+    }
+
+    // Keyboard shortcut: Pressing 'N' in-game skips the current night
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'n' || e.key === 'N') {
+        if (this.isRunning && !this.isGameOver && !this.hasWon) {
+          this.skipCurrentNight();
+        }
+      }
+    });
+
     const instant = window.location.search.includes('instant=1');
     if (window.location.search.includes('autostart')) {
       if (instant) {
@@ -1438,9 +1463,36 @@ class GameManager {
   }
 
   /* ==========================================================================
-     AUTHENTIC 6:00 AM WIN SCREEN
+     AUTHENTIC 6:00 AM WIN SCREEN & NIGHT SKIPPING
      ========================================================================== */
-  triggerWin() {
+  skipCurrentNight() {
+    if (!this.isRunning || this.isGameOver || this.hasWon) return;
+    const completed = typeof this.currentNight === 'number' ? this.currentNight : 5;
+    this.saveGameProgress(completed);
+    this.triggerWin(true);
+  }
+
+  skipNightOnMenu() {
+    let next = (this.saveData.night || 1) + 1;
+    if (next > 6) {
+      this.saveData.beatNight5 = true;
+      this.saveData.beatNight6 = true;
+      next = 6;
+    } else if (next > 5) {
+      this.saveData.beatNight5 = true;
+    }
+    this.saveData.night = next;
+    this.saveData.stars = (this.saveData.beatNight5 ? 1 : 0) + (this.saveData.beatNight6 ? 1 : 0);
+    try {
+      localStorage.setItem(this.saveDataKey, JSON.stringify(this.saveData));
+    } catch (e) {
+      console.warn('Could not save progress:', e);
+    }
+    this.updateTitleMenu();
+    if (window.soundEngine) window.soundEngine.play('blip', 0.6);
+  }
+
+  triggerWin(instant = false) {
     if (!this.isRunning || this.isGameOver || this.hasWon) return;
     this.hasWon = true;
     this.isRunning = false;
@@ -1464,6 +1516,29 @@ class GameManager {
     const winSub = document.getElementById('win-sub');
 
     if (winOverlay) winOverlay.classList.remove('hidden');
+    const nextNightBtn = document.getElementById('btn-next-night');
+    if (nextNightBtn) {
+      nextNightBtn.textContent = (this.currentNight === 'custom' || this.currentNight >= 6) ? 'CUSTOM NIGHT' : 'NEXT NIGHT';
+    }
+
+    if (instant) {
+      // Instant skip mode: immediately show 6 AM flip, night details, and next night button
+      if (clockDigit) {
+        clockDigit.textContent = '6 AM';
+        clockDigit.classList.add('flip');
+      }
+      if (winDetails) {
+        winDetails.hidden = false;
+        winDetails.classList.remove('hidden');
+        if (winSub) {
+          const nightName = (this.currentNight === 'custom') ? 'Custom Night' : `Night ${this.currentNight}`;
+          winSub.textContent = `You survived ${nightName}!`;
+        }
+      }
+      this.playTransitionSound('win_cheer', 1.0);
+      return;
+    }
+
     if (clockDigit) {
       clockDigit.textContent = '5 AM';
       clockDigit.classList.remove('flip');
@@ -1471,10 +1546,6 @@ class GameManager {
     if (winDetails) {
       winDetails.hidden = true;
       winDetails.classList.add('hidden');
-    }
-    const nextNightBtn = document.getElementById('btn-next-night');
-    if (nextNightBtn) {
-      nextNightBtn.textContent = (this.currentNight === 'custom' || this.currentNight >= 6) ? 'CUSTOM NIGHT' : 'NEXT NIGHT';
     }
 
     // Play Westminster chime + 6 church bell tolls, then kids cheer at 6.2s

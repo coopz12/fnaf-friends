@@ -72,6 +72,29 @@ class OfficeController {
     preloadRight.src = 'assets/doors/door_right_sheet.png';
     if (preloadRight.decode) preloadRight.decode().catch(() => {});
 
+    // Preload all hallway light and friend light images for instant 0ms switching
+    [
+      'assets/office/office_left_light.png',
+      'assets/office/office_left_light_trevor.png',
+      'assets/office/office_left_light_spencer.png',
+      'assets/office/office_right_light.png',
+      'assets/office/office_right_light_daxon_tongue.png',
+      'assets/office/office_right_light_chris.png',
+      'assets/office/office_right_light_chris_shirtless.png',
+      'assets/office/panel_left_both.png',
+      'assets/office/panel_left_door.png',
+      'assets/office/panel_left_light.png',
+      'assets/office/panel_left_off.png',
+      'assets/office/panel_right_both.png',
+      'assets/office/panel_right_door.png',
+      'assets/office/panel_right_light.png',
+      'assets/office/panel_right_off.png'
+    ].forEach(src => {
+      const img = new Image();
+      img.src = src;
+      if (img.decode) img.decode().catch(() => {});
+    });
+
     // Set initial rock-solid background
     this.bgImg.src = this.baseOfficePath;
 
@@ -162,8 +185,8 @@ class OfficeController {
       }
     });
 
-    // Wall Buttons Click (supports both mouse click and instant mobile touch)
-    const setupWallBtn = (btn, action) => {
+    // Door Toggle Button Setup (click or tap toggles door)
+    const setupDoorBtn = (btn, toggleAction) => {
       if (!btn) return;
       let touchStartX = 0;
       let touchStartY = 0;
@@ -172,13 +195,13 @@ class OfficeController {
 
       const triggerAction = (e) => {
         const now = Date.now();
-        if (now - lastTrigger < 280) return;
+        if (now - lastTrigger < 250) return;
         lastTrigger = now;
         if (e) {
           if (e.stopPropagation) e.stopPropagation();
           if (e.cancelable && e.preventDefault) e.preventDefault();
         }
-        action();
+        toggleAction();
       };
 
       btn.addEventListener('touchstart', (e) => {
@@ -194,7 +217,6 @@ class OfficeController {
           const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
           const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
           const dt = Date.now() - touchStartTime;
-          // Generous 45px thumb tap tolerance for mobile screens
           if (dx > 45 || dy > 45 || dt > 650) return;
         }
         triggerAction(e);
@@ -205,62 +227,158 @@ class OfficeController {
       });
     };
 
-    setupWallBtn(this.btnLeftDoor, () => this.toggleLeftDoor());
-    setupWallBtn(this.btnRightDoor, () => this.toggleRightDoor());
-    setupWallBtn(this.btnLeftLight, () => this.toggleLeftLight());
-    setupWallBtn(this.btnRightLight, () => this.toggleRightLight());
+    // Light Momentary Hold Setup (press down -> turn ON immediately; release/leave -> turn OFF immediately)
+    const setupLightBtn = (btn, setLightAction) => {
+      if (!btn) return;
 
-    // Delegated Panel Fallback: tapping anywhere on panel triggers top half (door) or bottom half (light)
-    const setupPanelDelegation = (panelId, toggleDoor, toggleLight) => {
+      const turnOn = (e) => {
+        if (e) {
+          if (e.stopPropagation) e.stopPropagation();
+          if (e.cancelable && e.preventDefault) e.preventDefault();
+        }
+        setLightAction(true);
+      };
+
+      const turnOff = (e) => {
+        if (e && e.stopPropagation) e.stopPropagation();
+        setLightAction(false);
+      };
+
+      // Mouse controls
+      btn.addEventListener('mousedown', (e) => {
+        if (e.button === 0) turnOn(e);
+      });
+      btn.addEventListener('mouseup', (e) => {
+        turnOff(e);
+      });
+      btn.addEventListener('mouseleave', (e) => {
+        turnOff(e);
+      });
+
+      // Touch controls (Mobile): turn on INSTANTLY on touchstart with 0ms delay!
+      btn.addEventListener('touchstart', (e) => {
+        turnOn(e);
+      }, { passive: false });
+
+      btn.addEventListener('touchend', (e) => {
+        turnOff(e);
+      }, { passive: false });
+
+      btn.addEventListener('touchcancel', (e) => {
+        turnOff(e);
+      }, { passive: false });
+    };
+
+    setupDoorBtn(this.btnLeftDoor, () => this.toggleLeftDoor());
+    setupDoorBtn(this.btnRightDoor, () => this.toggleRightDoor());
+    setupLightBtn(this.btnLeftLight, (on) => this.setLeftLight(on));
+    setupLightBtn(this.btnRightLight, (on) => this.setRightLight(on));
+
+    // Delegated Panel Fallback: top half toggles door, bottom half holds light
+    const setupPanelDelegation = (panelId, toggleDoor, setLight) => {
       const panel = document.getElementById(panelId);
       if (!panel) return;
       let pStartX = 0;
       let pStartY = 0;
       let pStartTime = 0;
-      let pLastTrigger = 0;
+      let isPressingLight = false;
 
-      const handlePanelAt = (clientY, e) => {
-        const now = Date.now();
-        if (now - pLastTrigger < 280) return;
-        pLastTrigger = now;
-        if (e && e.stopPropagation) e.stopPropagation();
+      // Mouse controls on panel
+      panel.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
         const r = panel.getBoundingClientRect();
-        const relY = clientY - r.top;
-        if (relY < r.height * 0.5) {
-          toggleDoor();
-        } else {
-          toggleLight();
+        const relY = e.clientY - r.top;
+        if (relY >= r.height * 0.5) {
+          isPressingLight = true;
+          setLight(true);
+          e.stopPropagation();
         }
-      };
+      });
 
+      panel.addEventListener('mouseup', (e) => {
+        if (isPressingLight) {
+          isPressingLight = false;
+          setLight(false);
+          e.stopPropagation();
+        }
+      });
+
+      panel.addEventListener('mouseleave', (e) => {
+        if (isPressingLight) {
+          isPressingLight = false;
+          setLight(false);
+        }
+      });
+
+      panel.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        const r = panel.getBoundingClientRect();
+        const relY = e.clientY - r.top;
+        if (relY < r.height * 0.5) {
+          e.stopPropagation();
+          toggleDoor();
+        }
+      });
+
+      // Touch controls on panel
       panel.addEventListener('touchstart', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
         if (e.touches && e.touches[0]) {
           pStartX = e.touches[0].clientX;
           pStartY = e.touches[0].clientY;
           pStartTime = Date.now();
+          const r = panel.getBoundingClientRect();
+          const relY = pStartY - r.top;
+          if (relY >= r.height * 0.5) {
+            isPressingLight = true;
+            if (e.cancelable) e.preventDefault();
+            e.stopPropagation();
+            setLight(true);
+          }
         }
-      }, { passive: true });
+      }, { passive: false });
 
       panel.addEventListener('touchend', (e) => {
-        if (e.target.tagName === 'BUTTON') return; // Handled by button
+        if (e.target.tagName === 'BUTTON') return;
+        if (isPressingLight) {
+          isPressingLight = false;
+          setLight(false);
+          if (e.cancelable) e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
         if (e.changedTouches && e.changedTouches[0]) {
           const dx = Math.abs(e.changedTouches[0].clientX - pStartX);
           const dy = Math.abs(e.changedTouches[0].clientY - pStartY);
           const dt = Date.now() - pStartTime;
           if (dx > 45 || dy > 45 || dt > 650) return;
-          if (e.cancelable) e.preventDefault();
-          handlePanelAt(e.changedTouches[0].clientY, e);
+          const r = panel.getBoundingClientRect();
+          const relY = e.changedTouches[0].clientY - r.top;
+          if (relY < r.height * 0.5) {
+            if (e.cancelable) e.preventDefault();
+            toggleDoor();
+          }
         }
       }, { passive: false });
 
-      panel.addEventListener('click', (e) => {
-        if (e.target.tagName === 'BUTTON') return; // Handled by button
-        handlePanelAt(e.clientY, e);
-      });
+      panel.addEventListener('touchcancel', () => {
+        if (isPressingLight) {
+          isPressingLight = false;
+          setLight(false);
+        }
+      }, { passive: false });
     };
 
-    setupPanelDelegation('left-wall-panel', () => this.toggleLeftDoor(), () => this.toggleLeftLight());
-    setupPanelDelegation('right-wall-panel', () => this.toggleRightDoor(), () => this.toggleRightLight());
+    setupPanelDelegation('left-wall-panel', () => this.toggleLeftDoor(), (on) => this.setLeftLight(on));
+    setupPanelDelegation('right-wall-panel', () => this.toggleRightDoor(), (on) => this.setRightLight(on));
+
+    // Global safety release: releasing mouse or touch anywhere turns off lights
+    ['mouseup', 'touchend', 'touchcancel', 'pointerup', 'pointercancel'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        if (this.leftLightOn) this.setLeftLight(false);
+        if (this.rightLightOn) this.setRightLight(false);
+      }, { passive: true });
+    });
   }
 
   /* ==========================================================================
@@ -395,21 +513,21 @@ class OfficeController {
   }
 
   /* ==========================================================================
-     HALLWAY LIGHTING
+     HALLWAY LIGHTING (MOMENTARY HOLD - 0ms LATENCY)
      ========================================================================== */
-  toggleLeftLight() {
-    if (this.leftJammed) {
+  setLeftLight(on) {
+    if (this.leftJammed && on) {
       window.soundEngine.playErrorBuzz();
       return;
     }
-    // If right light is on, turn it off first
-    if (this.rightLightOn) {
-      this.rightLightOn = false;
-      if (this.ledRightLight) this.ledRightLight.classList.remove('active');
-      window.soundEngine.setLightHum('right', false);
+    if (this.leftLightOn === on) return;
+
+    // If turning on left, make sure right is off
+    if (on && this.rightLightOn) {
+      this.setRightLight(false);
     }
 
-    this.leftLightOn = !this.leftLightOn;
+    this.leftLightOn = on;
     if (this.ledLeftLight) this.ledLeftLight.classList.toggle('active', this.leftLightOn);
     this.updatePanelTextures();
     window.soundEngine.setLightHum('left', this.leftLightOn);
@@ -435,19 +553,23 @@ class OfficeController {
     this.updateUsageDisplay();
   }
 
-  toggleRightLight() {
-    if (this.rightJammed) {
+  toggleLeftLight() {
+    this.setLeftLight(!this.leftLightOn);
+  }
+
+  setRightLight(on) {
+    if (this.rightJammed && on) {
       window.soundEngine.playErrorBuzz();
       return;
     }
-    // If left light is on, turn it off first
-    if (this.leftLightOn) {
-      this.leftLightOn = false;
-      if (this.ledLeftLight) this.ledLeftLight.classList.remove('active');
-      window.soundEngine.setLightHum('left', false);
+    if (this.rightLightOn === on) return;
+
+    // If turning on right, make sure left is off
+    if (on && this.leftLightOn) {
+      this.setLeftLight(false);
     }
 
-    this.rightLightOn = !this.rightLightOn;
+    this.rightLightOn = on;
     if (this.ledRightLight) this.ledRightLight.classList.toggle('active', this.rightLightOn);
     this.updatePanelTextures();
     window.soundEngine.setLightHum('right', this.rightLightOn);
@@ -473,6 +595,10 @@ class OfficeController {
     }
 
     this.updateUsageDisplay();
+  }
+
+  toggleRightLight() {
+    this.setRightLight(!this.rightLightOn);
   }
 
   updatePanelTextures() {
