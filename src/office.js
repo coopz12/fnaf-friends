@@ -216,6 +216,9 @@ class OfficeController {
     } else {
       window.soundEngine.playDoorOpen();
       this.playDoorAnimation('left', false);
+      if (this.game && this.game.onDoorOpened) {
+        this.game.onDoorOpened('left');
+      }
     }
 
     this.updateUsageDisplay();
@@ -238,6 +241,9 @@ class OfficeController {
     } else {
       window.soundEngine.playDoorOpen();
       this.playDoorAnimation('right', false);
+      if (this.game && this.game.onDoorOpened) {
+        this.game.onDoorOpened('right');
+      }
     }
 
     this.updateUsageDisplay();

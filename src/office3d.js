@@ -703,8 +703,10 @@ class Office3D {
     window.soundEngine.playButtonClick();
     if (this.leftDoorClosed) {
       window.soundEngine.playDoorSlam();
+      if (this.game && this.game.onDoorClosed) this.game.onDoorClosed('left');
     } else {
       window.soundEngine.playDoorOpen();
+      if (this.game && this.game.onDoorOpened) this.game.onDoorOpened('left');
     }
 
     if (this.game) this.game.onPowerStateChanged();
@@ -721,8 +723,10 @@ class Office3D {
     window.soundEngine.playButtonClick();
     if (this.rightDoorClosed) {
       window.soundEngine.playDoorSlam();
+      if (this.game && this.game.onDoorClosed) this.game.onDoorClosed('right');
     } else {
       window.soundEngine.playDoorOpen();
+      if (this.game && this.game.onDoorOpened) this.game.onDoorOpened('right');
     }
 
     if (this.game) this.game.onPowerStateChanged();

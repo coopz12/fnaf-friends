@@ -18,7 +18,7 @@ class SoundEngine {
       door_bang: 'assets/audio/door_bang.mp3',
       ambience: 'assets/audio/ambience.mp3',
       laugh: 'assets/audio/laugh.mp3',
-      running: 'assets/audio/running_loud.wav',
+      running: 'assets/audio/running.mp3',
       window_scare: 'assets/audio/window_scare.mp3',
       win_cheer: 'assets/audio/win_cheer.mp3',
       door_slam: 'assets/audio/door_slam.mp3',
@@ -31,6 +31,9 @@ class SoundEngine {
       kitchen2: 'assets/audio/kitchen2.mp3',
       deep_steps: 'assets/audio/deep_steps.mp3',
       phone_guy: 'assets/audio/phone_call.mp3',
+      phone_night2: 'assets/audio/phone_night2.mp3',
+      phone_night3: 'assets/audio/phone_night3.mp3',
+      phone_night4: 'assets/audio/phone_night4.mp3',
       music_box: 'assets/audio/music_box.wav',
       chime_6am: 'assets/audio/chime_6am.wav'
     };
@@ -60,12 +63,16 @@ class SoundEngine {
   }
 
   startTitleMusic() {
-    if (this.titleAudio) return;
     try {
-      this.titleAudio = new Audio(this.soundPaths.ambience);
-      this.titleAudio.loop = true;
-      this.titleAudio.volume = 0.32;
-      this.titleAudio.play().catch(() => {});
+      if (!this.titleAudio) {
+        this.titleAudio = new Audio(this.soundPaths.ambience);
+        this.titleAudio.loop = true;
+        this.titleAudio.volume = 0.32;
+      }
+      if (this.titleAudio.paused) {
+        const p = this.titleAudio.play();
+        if (p && p.catch) p.catch(() => {});
+      }
     } catch (e) {}
   }
 
@@ -141,47 +148,8 @@ class SoundEngine {
 
   playRunning() {
     this.stopRunning();
-
-    // 1. Play high-impact stereo audio file
+    // Play authentic FNAF 1 Foxy hallway running footsteps
     this.runningAudio = this.play('running', 1.0);
-
-    // 2. High-impact left-channel footsteps synthesis
-    try {
-      const ctx = this.getAudioContext();
-      if (!ctx) return;
-      const panner = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-      if (panner) {
-        panner.pan.value = -0.80; // Heavy left ear bias (West Hall)
-        panner.connect(ctx.destination);
-      }
-      const dest = panner || ctx.destination;
-
-      const stepsCount = 14;
-      let time = ctx.currentTime + 0.04;
-      let stepInterval = 0.24;
-
-      for (let i = 0; i < stepsCount; i++) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(220, time);
-        osc.frequency.exponentialRampToValueAtTime(55, time + 0.14);
-
-        const vol = 0.65 + (i / stepsCount) * 0.35;
-        gain.gain.setValueAtTime(vol, time);
-        gain.gain.exponentialRampToValueAtTime(0.005, time + 0.16);
-
-        osc.connect(gain);
-        gain.connect(dest);
-
-        osc.start(time);
-        osc.stop(time + 0.17);
-
-        time += stepInterval;
-        stepInterval = Math.max(0.14, stepInterval * 0.94);
-      }
-    } catch (e) {}
   }
 
   stopRunning() {

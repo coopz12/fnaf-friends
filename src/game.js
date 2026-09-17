@@ -55,6 +55,8 @@ class GameManager {
         coveTimer: 0,
         isSprinting: false,
         sprintTimeRemaining: 0,
+        isBanging: false,
+        bangTimer: 0,
         doorWaitSeconds: 0,
         jumpscareImg: "assets/friends/trevor_scare.jpg"
       },
@@ -87,14 +89,14 @@ class GameManager {
       }
     };
 
-    // Night AI balance configuration
+    // Canonical FNAF 1 AI configurations
     this.nightConfigs = {
-      1: { spencer: 0, chris: 0, trevor: 1, daxon: 1 },
-      2: { spencer: 3, chris: 1, trevor: 2, daxon: 3 },
-      3: { spencer: 5, chris: 4, trevor: 3, daxon: 5 },
-      4: { spencer: 8, chris: 7, trevor: 6, daxon: 8 },
-      5: { spencer: 12, chris: 10, trevor: 10, daxon: 12 },
-      6: { spencer: 16, chris: 14, trevor: 14, daxon: 16 }
+      1: { spencer: 0, chris: 0, trevor: 0, daxon: 0 },
+      2: { spencer: 3, chris: 0, trevor: 1, daxon: 1 },
+      3: { spencer: 0, chris: 1, trevor: 2, daxon: 5 },
+      4: { spencer: 2, chris: 1, trevor: 6, daxon: 4 },
+      5: { spencer: 5, chris: 3, trevor: 5, daxon: 7 },
+      6: { spencer: 10, chris: 4, trevor: 14, daxon: 12 }
     };
 
     // Save Data
@@ -118,6 +120,7 @@ class GameManager {
     this.timerGeneration = 0;
     this.phoneCallTimer = null;
     this.transitionSounds = new Set();
+    this.kitchenClatterTimer = 0;
 
     this.init();
   }
@@ -193,11 +196,13 @@ class GameManager {
       window.soundEngine.unlockAudio();
       window.soundEngine.startTitleMusic();
       tryLockLandscape();
-      window.removeEventListener('pointerdown', unlockOnFirstTouch);
-      window.removeEventListener('keydown', unlockOnFirstTouch);
+      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(evt => {
+        window.removeEventListener(evt, unlockOnFirstTouch);
+      });
     };
-    window.addEventListener('pointerdown', unlockOnFirstTouch);
-    window.addEventListener('keydown', unlockOnFirstTouch);
+    ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(evt => {
+      window.addEventListener(evt, unlockOnFirstTouch, { passive: true });
+    });
 
     // Initial audio attempt
     window.soundEngine.startTitleMusic();
@@ -733,6 +738,9 @@ class GameManager {
     this.friends.trevor.isSprinting = false;
     this.friends.trevor.sprintTimeRemaining = 0;
     this.friends.trevor.doorWaitSeconds = 0;
+    this.friends.trevor.isBanging = false;
+    this.friends.trevor.bangTimer = 0;
+    this.kitchenClatterTimer = 0;
 
     this.friends.chris.currentRoom = '1A';
     this.friends.chris.doorWaitSeconds = 0;
@@ -818,8 +826,8 @@ class GameManager {
     this.startAIMovementLoop();
     this.startHallucinationLoop();
 
-    // Start Phone Guy call on Night 1
-    if (this.currentNight === 1) {
+    // Start Phone Guy call on Nights 1 to 4
+    if ([1, 2, 3, 4].includes(this.currentNight)) {
       this.startPhoneCall();
     }
   }
@@ -856,9 +864,27 @@ class GameManager {
         const hours = ['12 AM', '1 AM', '2 AM', '3 AM', '4 AM', '5 AM', '6 AM'];
         this.hudTime.textContent = hours[this.currentHour] || '6 AM';
 
-        // Animatronic AI level increases slightly each hour!
+        // Animatronic AI level increases slightly each hour (Canonical FNAF 1 canon)
         if (this.currentNight !== 'custom' && this.currentHour < 6) {
-          Object.values(this.friends).forEach(f => f.aiLevel = this.clampAI(f.aiLevel + 1));
+          if (this.currentNight === 1) {
+            // Chris (Freddy) NEVER moves on Night 1!
+            if (this.currentHour === 2) this.friends.spencer.aiLevel = this.clampAI(this.friends.spencer.aiLevel + 1);
+            if (this.currentHour === 3) this.friends.daxon.aiLevel = this.clampAI(this.friends.daxon.aiLevel + 1);
+            if (this.currentHour === 4) this.friends.trevor.aiLevel = this.clampAI(this.friends.trevor.aiLevel + 1);
+          } else if (this.currentNight === 2) {
+            // Chris (Freddy) stays at 0 on Night 2!
+            if (this.currentHour === 3) this.friends.spencer.aiLevel = this.clampAI(this.friends.spencer.aiLevel + 1);
+            if (this.currentHour === 4) this.friends.daxon.aiLevel = this.clampAI(this.friends.daxon.aiLevel + 1);
+            if (this.currentHour === 5) this.friends.trevor.aiLevel = this.clampAI(this.friends.trevor.aiLevel + 1);
+          } else {
+            // Nights 3+: squad advances
+            this.friends.spencer.aiLevel = this.clampAI(this.friends.spencer.aiLevel + 1);
+            this.friends.daxon.aiLevel = this.clampAI(this.friends.daxon.aiLevel + 1);
+            this.friends.trevor.aiLevel = this.clampAI(this.friends.trevor.aiLevel + 1);
+            if (this.currentHour >= 3) {
+              this.friends.chris.aiLevel = this.clampAI(this.friends.chris.aiLevel + 1);
+            }
+          }
         }
 
         if (this.currentHour >= 6) {
@@ -866,6 +892,9 @@ class GameManager {
           return;
         }
       }
+
+      // Kitchen clatter audio
+      this.updateKitchenAudio(delta);
 
       // Doorway attack check
       this.checkDoorwayAttacks(delta);
@@ -930,7 +959,7 @@ class GameManager {
           trevor.coveStage = 4;
           trevor.isSprinting = true;
           trevor.currentRoom = '2A';
-          trevor.sprintTimeRemaining = 3.2; // 3.2s sprint window
+          trevor.sprintTimeRemaining = 2.5; // ~2.5s sprint window matching running audio
           window.soundEngine.playRunning();
 
           if (this.cameras && this.cameras.isOpen) {
@@ -1004,11 +1033,24 @@ class GameManager {
     }
   }
 
+  onDoorOpened(side) {
+    if (!this.isRunning || this.isPowerOut || this.isGameOver) return;
+    if (side === 'left') {
+      // If player opens the left door WHILE Trevor is actively banging: instant jumpscare!
+      if (this.friends.trevor.isBanging) {
+        this.friends.trevor.isBanging = false;
+        window.soundEngine.stopRunning();
+        this.triggerJumpscare(this.friends.trevor);
+      }
+    }
+  }
+
   onDoorClosed(side) {
     if (!this.isRunning || this.isPowerOut || this.isGameOver) return;
     if (side === 'left') {
       let blocked = false;
-      if (this.friends.trevor.currentRoom === 'left_door') {
+      // If Trevor was lingering (non-sprinting / non-banging)
+      if (this.friends.trevor.currentRoom === 'left_door' && !this.friends.trevor.isBanging && !this.friends.trevor.isSprinting) {
         window.soundEngine.stopRunning();
         this.friends.trevor.currentRoom = '1C'; // Trevor retreats back to cove!
         this.friends.trevor.coveStage = 1;
@@ -1016,6 +1058,8 @@ class GameManager {
         this.friends.trevor.isSprinting = false;
         this.friends.trevor.sprintTimeRemaining = 0;
         this.friends.trevor.doorWaitSeconds = 0;
+        this.friends.trevor.isBanging = false;
+        this.friends.trevor.bangTimer = 0;
         blocked = true;
       }
       if (this.friends.spencer.currentRoom === 'left_door') {
@@ -1047,45 +1091,64 @@ class GameManager {
     if (!this.isRunning || this.isPowerOut || this.isGameOver) return;
     const trevor = this.friends.trevor;
 
-    // Handle Trevor active sprint
+    // 1. Handle Trevor active sprint down West Hall (CAM 2A)
     if (trevor.isSprinting) {
       trevor.sprintTimeRemaining -= delta;
       if (trevor.sprintTimeRemaining <= 0) {
         trevor.isSprinting = false;
-        trevor.currentRoom = 'left_door';
+        window.soundEngine.stopRunning();
 
         if (this.office.leftDoorClosed) {
-          // Left door closed! BANG!
-          window.soundEngine.stopRunning();
+          // Left door was closed in time! Foxy bangs repeatedly on the metal door!
           window.soundEngine.play('door_bang', 0.95);
-          this.powerPercent = Math.max(0, this.powerPercent - 1.5);
-          this.powerPercentEl.textContent = `${Math.floor(this.powerPercent)}%`;
-
-          trevor.currentRoom = '1C';
-          trevor.coveStage = 1;
-          trevor.coveTimer = 0;
-          trevor.sprintTimeRemaining = 0;
+          trevor.isBanging = true;
+          trevor.bangTimer = 3.2; // Knocks duration: door cannot be safely opened until this expires!
+          trevor.currentRoom = 'left_door';
           trevor.doorWaitSeconds = 0;
+
+          // Power drain from Foxy banging on door
+          this.powerPercent = Math.max(0, this.powerPercent - 2.0);
+          this.powerPercentEl.textContent = `${Math.floor(this.powerPercent)}%`;
           if (this.powerPercent <= 0) {
             this.triggerPowerOutage();
             return;
           }
-
-          if (this.cameras && this.cameras.isOpen) {
-            this.cameras.triggerStaticBurst();
-            this.cameras.updateFeedDisplay();
-          }
         } else {
-          // Door was open! JUMPSCARE!
-          window.soundEngine.stopRunning();
+          // Door was open! Instant jumpscare!
           this.triggerJumpscare(trevor);
           return;
         }
       }
     }
 
-    // Check left door (Spencer or Trevor lingering)
-    if (trevor.currentRoom === 'left_door') {
+    // 2. Handle Trevor active door-banging state
+    if (trevor.isBanging) {
+      // If player opens door while he is banging: instant jumpscare!
+      if (!this.office.leftDoorClosed) {
+        trevor.isBanging = false;
+        this.triggerJumpscare(trevor);
+        return;
+      }
+
+      trevor.bangTimer -= delta;
+      if (trevor.bangTimer <= 0) {
+        // Banging is complete! Now it's safe to open the door!
+        trevor.isBanging = false;
+        trevor.currentRoom = '1C'; // Trevor retreats back to Pirate Cove
+        trevor.coveStage = 1;
+        trevor.coveTimer = 0;
+        trevor.sprintTimeRemaining = 0;
+        trevor.doorWaitSeconds = 0;
+
+        if (this.cameras && this.cameras.isOpen) {
+          if (this.cameras.activeCam === '1C') this.cameras.triggerStaticBurst();
+          this.cameras.updateFeedDisplay();
+        }
+      }
+    }
+
+    // 3. Check left door (Trevor lingering if non-banging)
+    if (trevor.currentRoom === 'left_door' && !trevor.isBanging && !trevor.isSprinting) {
       if (this.office.leftDoorClosed) {
         this.onDoorClosed('left');
       } else {
@@ -1098,6 +1161,7 @@ class GameManager {
       }
     }
 
+    // Check Spencer at left door
     if (this.friends.spencer.currentRoom === 'left_door') {
       if (this.office.leftDoorClosed) {
         this.onDoorClosed('left');
@@ -1132,6 +1196,26 @@ class GameManager {
           this.triggerJumpscare(this.friends.chris);
         }
       }
+    }
+  }
+
+  updateKitchenAudio(delta) {
+    if (!this.isRunning || this.isPowerOut || this.isGameOver) return;
+
+    const chrisInKitchen = (this.friends.chris && this.friends.chris.currentRoom === '6');
+    if (!chrisInKitchen) {
+      this.kitchenClatterTimer = 0;
+      return;
+    }
+
+    // Chris is in the kitchen clattering pots, pans, and eating pizza!
+    this.kitchenClatterTimer = (this.kitchenClatterTimer || 0) - delta;
+    if (this.kitchenClatterTimer <= 0) {
+      this.kitchenClatterTimer = 2.4 + Math.random() * 2.2; // Every 2.4 - 4.6 seconds
+      const isViewingKitchen = (this.cameras && this.cameras.isOpen && this.cameras.activeCam === '6');
+      const volume = isViewingKitchen ? 0.85 : 0.25; // Loud on CAM 6, ambient elsewhere
+      const soundKey = Math.random() > 0.5 ? 'kitchen1' : 'kitchen2';
+      window.soundEngine.play(soundKey, volume);
     }
   }
 
@@ -1385,6 +1469,9 @@ class GameManager {
     this.friends.trevor.isSprinting = false;
     this.friends.trevor.sprintTimeRemaining = 0;
     this.friends.trevor.doorWaitSeconds = 0;
+    this.friends.trevor.isBanging = false;
+    this.friends.trevor.bangTimer = 0;
+    this.kitchenClatterTimer = 0;
 
     this.friends.chris.currentRoom = '1A';
     this.friends.chris.doorWaitSeconds = 0;
@@ -1407,11 +1494,19 @@ class GameManager {
 
     this.mutePhoneCall(false);
 
+    let soundKey = null;
+    if (this.currentNight === 1) soundKey = 'phone_guy';
+    else if (this.currentNight === 2) soundKey = 'phone_night2';
+    else if (this.currentNight === 3) soundKey = 'phone_night3';
+    else if (this.currentNight === 4) soundKey = 'phone_night4';
+
+    if (!soundKey) return;
+
     this.phoneCallTimer = this.scheduleTimeout(() => {
       this.phoneCallTimer = null;
       if (!this.isRunning || this.isGameOver || this.isPowerOut) return;
       widget.classList.remove('hidden');
-      this.phoneCallSound = window.soundEngine.play('phone_guy', 0.95);
+      this.phoneCallSound = window.soundEngine.play(soundKey, 0.95);
       if (this.phoneCallSound) {
         this.phoneCallSound.onended = () => {
           this.mutePhoneCall(false);

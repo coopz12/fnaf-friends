@@ -106,7 +106,6 @@ class CameraController {
       'assets/cameras/feeds/cam3_spencer_chocolate.png',
       'assets/cameras/feeds/cam3_spencer.png',
       'assets/cameras/feeds/cam3_empty.png',
-      'assets/cameras/feeds/cam5_bunny.png',
       'assets/cameras/feeds/cam5_spencer.png',
       'assets/cameras/feeds/cam5_empty.png',
       'assets/cameras/feeds/cam6.png',
@@ -164,7 +163,7 @@ class CameraController {
 
     if (this.camFeedContainer) {
       this.camFeedContainer.addEventListener('click', () => {
-        if (this.camFeedImg && (this.camFeedImg.src.includes('cam3_dog') || this.camFeedImg.src.includes('cam5_bunny'))) {
+        if (this.camFeedImg && this.camFeedImg.src.includes('cam3_dog')) {
           window.soundEngine.playSqueak();
         }
       });
@@ -503,12 +502,8 @@ class CameraController {
         break;
       }
 
-      case '5': { // Backstage (Spencer Gaming Headset or Spencer with Judy Hopps Bunny Easter Egg!)
-        if (spencerRoom === '5') {
-          feedSrc = (Math.random() < 0.35) ? 'assets/cameras/feeds/cam5_bunny.png' : 'assets/cameras/feeds/cam5_spencer.png';
-        } else {
-          feedSrc = (Math.random() < 0.15) ? 'assets/cameras/feeds/cam5_bunny.png' : 'assets/cameras/feeds/cam5_empty.png';
-        }
+      case '5': { // Backstage (Spencer Gaming Headset)
+        feedSrc = (spencerRoom === '5') ? 'assets/cameras/feeds/cam5_spencer.png' : 'assets/cameras/feeds/cam5_empty.png';
         break;
       }
 
@@ -576,14 +571,10 @@ class CameraController {
   }
 
   startKitchenAudio() {
-    if (this.kitchenAudio) return;
-    window.soundEngine.play('kitchen1', 0.8);
-    this.kitchenAudio = setInterval(() => {
-      if (this.isOpen && this.activeCam === '6') {
-        const soundKey = Math.random() > 0.5 ? 'kitchen1' : 'kitchen2';
-        window.soundEngine.play(soundKey, 0.7);
-      }
-    }, 2800);
+    this.stopKitchenAudio();
+    if (this.game && this.game.friends && this.game.friends.chris.currentRoom === '6') {
+      window.soundEngine.play('kitchen1', 0.85);
+    }
   }
 
   stopKitchenAudio() {
