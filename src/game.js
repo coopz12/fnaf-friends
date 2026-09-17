@@ -323,6 +323,15 @@ class GameManager {
     const btnCloseMobileGuide = document.getElementById('btn-close-mobile-guide');
     const btnGuideProceedAnyway = document.getElementById('btn-guide-proceed-anyway');
 
+    // Detect if user is actually on a mobile device
+    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    // Only show the "PLAY ON MOBILE" button on actual mobile devices
+    if (isMobileDevice && btnMobileGuide) {
+      btnMobileGuide.classList.remove('hidden');
+    }
+
     const openMobileGuide = () => {
       window.soundEngine.playButtonClick();
       if (mobileGuideModal) mobileGuideModal.classList.remove('hidden');
@@ -330,7 +339,7 @@ class GameManager {
 
     const closeMobileGuide = () => {
       window.soundEngine.playButtonClick();
-      try { sessionStorage.setItem('fnaf_mobile_guide_dismissed', 'true'); } catch (e) {}
+      try { localStorage.setItem('fnaf_mobile_guide_dismissed', 'true'); } catch (e) {}
       if (mobileGuideModal) mobileGuideModal.classList.add('hidden');
       window.soundEngine.unlockAudio();
       window.soundEngine.startTitleMusic();
@@ -340,12 +349,11 @@ class GameManager {
     if (btnCloseMobileGuide) btnCloseMobileGuide.addEventListener('click', closeMobileGuide);
     if (btnGuideProceedAnyway) btnGuideProceedAnyway.addEventListener('click', closeMobileGuide);
 
-    // Auto-pop mobile guide for mobile browser users (not standalone PWA)
+    // Auto-pop mobile guide ONLY on title screen for mobile browser users (not standalone PWA)
+    // Uses localStorage so it only shows once ever (not every session)
     try {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 1024);
-      const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-      const dismissed = sessionStorage.getItem('fnaf_mobile_guide_dismissed');
-      if (isMobile && !isStandalone && !dismissed && mobileGuideModal) {
+      const dismissed = localStorage.getItem('fnaf_mobile_guide_dismissed');
+      if (isMobileDevice && !isStandalone && !dismissed && mobileGuideModal) {
         mobileGuideModal.classList.remove('hidden');
       }
     } catch (e) {}
@@ -776,7 +784,7 @@ class GameManager {
       this.titleScreen.hidden = true;
       this.titleScreen.classList.add('hidden');
     }
-    ['win-overlay', 'custom-night-modal', 'jumpscare-overlay', 'night-intro-overlay', 'gameover-overlay'].forEach(id => {
+    ['win-overlay', 'custom-night-modal', 'jumpscare-overlay', 'night-intro-overlay', 'gameover-overlay', 'mobile-guide-modal', 'controls-modal'].forEach(id => {
       const overlay = document.getElementById(id);
       if (overlay) overlay.classList.add('hidden');
     });
