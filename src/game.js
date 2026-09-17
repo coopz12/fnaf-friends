@@ -648,30 +648,6 @@ class GameManager {
       });
     }
 
-    // In-game HUD Skip Night Button
-    const hudSkipBtn = document.getElementById('btn-hud-skip-night');
-    if (hudSkipBtn) {
-      hudSkipBtn.addEventListener('click', () => {
-        this.skipCurrentNight();
-      });
-    }
-
-    // Title Screen Skip Night Button
-    const titleSkipBtn = document.getElementById('title-btn-skip-night');
-    if (titleSkipBtn) {
-      titleSkipBtn.addEventListener('click', () => {
-        this.skipNightOnMenu();
-      });
-    }
-
-    // Keyboard shortcut: Pressing 'N' in-game skips the current night
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'n' || e.key === 'N') {
-        if (this.isRunning && !this.isGameOver && !this.hasWon) {
-          this.skipCurrentNight();
-        }
-      }
-    });
 
     const instant = window.location.search.includes('instant=1');
     if (window.location.search.includes('autostart')) {
