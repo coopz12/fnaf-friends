@@ -21,6 +21,7 @@ class CameraController {
 
     this.titleCodeEl = document.getElementById('cam-title-code');
     this.titleNameEl = document.getElementById('cam-title-name');
+    this.mapRoomTitleEl = document.getElementById('cam-map-room-title');
     this.kitchenOverlay = document.getElementById('cam-kitchen-overlay');
     this.camButtons = document.querySelectorAll('.cam-btn');
 
@@ -385,8 +386,10 @@ class CameraController {
     });
 
     // Update HUD
-    this.titleCodeEl.textContent = `CAM ${camCode}`;
-    this.titleNameEl.textContent = this.roomNames[camCode] || '';
+    const roomName = this.roomNames[camCode] || '';
+    if (this.titleCodeEl) this.titleCodeEl.textContent = `CAM ${camCode}`;
+    if (this.titleNameEl) this.titleNameEl.textContent = roomName;
+    if (this.mapRoomTitleEl) this.mapRoomTitleEl.textContent = roomName;
 
     // Update Feed Image
     this.updateFeedDisplay(force);

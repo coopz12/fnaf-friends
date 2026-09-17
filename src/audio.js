@@ -41,6 +41,49 @@ class SoundEngine {
     this.loops = {};
     this.titleAudio = null;
     this.runningAudio = null;
+    this.masterVolume = 1.0;
+    try {
+      const saved = localStorage.getItem('fnaf_volume');
+      if (saved !== null) {
+        const v = parseFloat(saved);
+        if (!isNaN(v) && v >= 0 && v <= 1) this.masterVolume = v;
+      }
+    } catch (e) {}
+  }
+
+  setMasterVolume(val) {
+    const num = Math.max(0, Math.min(1, parseFloat(val)));
+    this.masterVolume = Number.isFinite(num) ? num : 1.0;
+    try {
+      localStorage.setItem('fnaf_volume', this.masterVolume.toString());
+    } catch (e) {}
+
+    // Adjust active title audio
+    if (this.titleAudio) {
+      this.titleAudio.volume = Math.max(0, Math.min(1, 0.32 * this.masterVolume));
+    }
+
+    // Adjust active loops
+    Object.keys(this.loops).forEach(key => {
+      const sound = this.loops[key];
+      if (sound) {
+        const baseVol = (key === 'fan') ? 0.35 : ((key === 'ambience') ? 0.4 : 0.35);
+        sound.volume = Math.max(0, Math.min(1, baseVol * this.masterVolume));
+      }
+    });
+
+    // Adjust active audio elements in pool
+    Object.keys(this.audioPool).forEach(k => {
+      this.audioPool[k].forEach(a => {
+        if (!a.paused && !a.ended) {
+          a.volume = Math.max(0, Math.min(1, this.masterVolume));
+        }
+      });
+    });
+  }
+
+  getMasterVolume() {
+    return this.masterVolume;
   }
 
   getAudioContext() {
@@ -70,7 +113,7 @@ class SoundEngine {
       if (!this.titleAudio) {
         this.titleAudio = new Audio(this.soundPaths.ambience);
         this.titleAudio.loop = true;
-        this.titleAudio.volume = 0.32;
+        this.titleAudio.volume = Math.max(0, Math.min(1, 0.32 * this.masterVolume));
       }
       if (this.titleAudio.paused) {
         const p = this.titleAudio.play();
@@ -129,7 +172,7 @@ class SoundEngine {
     }
 
     try {
-      audio.volume = volume;
+      audio.volume = Math.max(0, Math.min(1, volume * this.masterVolume));
       audio.currentTime = 0;
       audio.play().catch(() => {});
     } catch (e) {}
@@ -222,7 +265,7 @@ class SoundEngine {
     if (!src) return;
     const sound = new Audio(src);
     sound.loop = true;
-    sound.volume = volume;
+    sound.volume = Math.max(0, Math.min(1, volume * this.masterVolume));
     sound.play().catch(() => {});
     this.loops[key] = sound;
   }
@@ -256,7 +299,7 @@ class SoundEngine {
       if (!this.loops[loopKey]) {
         const sound = new Audio(this.soundPaths.light_buzz);
         sound.loop = true;
-        sound.volume = 0.35;
+        sound.volume = Math.max(0, Math.min(1, 0.35 * this.masterVolume));
         sound.play().catch(() => {});
         this.loops[loopKey] = sound;
       }

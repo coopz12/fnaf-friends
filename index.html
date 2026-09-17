@@ -95,9 +95,17 @@
         <button id="title-btn-controls" class="title-action-btn">
           <span class="action-icon">🎮</span> CONTROLS
         </button>
+        <button id="title-btn-mobile-guide" class="title-action-btn" title="How to play in fullscreen on mobile">
+          <span class="action-icon">📱</span> PLAY ON MOBILE
+        </button>
         <button id="title-btn-reset" class="title-action-btn title-reset-btn" title="Reset Night Progression">
           <span>↺</span> RESET SAVE
         </button>
+        <div class="title-volume-widget">
+          <span id="title-vol-icon" class="title-vol-icon" title="Toggle Mute">🔊</span>
+          <input type="range" id="title-volume-slider" class="fnaf-volume-slider" min="0" max="100" value="100" title="Master Volume">
+          <span id="title-volume-text" class="title-volume-text">100%</span>
+        </div>
       </div>
     </div>
 
@@ -137,37 +145,121 @@
         <button id="btn-close-controls" class="btn-close-modal">✕</button>
       </div>
       <div class="controls-content">
+        <div class="ctrl-section volume-ctrl-section">
+          <h3>🔊 MASTER AUDIO VOLUME</h3>
+          <div class="modal-volume-widget">
+            <span id="modal-vol-icon" class="title-vol-icon">🔊</span>
+            <input type="range" id="modal-volume-slider" class="fnaf-volume-slider modal-slider" min="0" max="100" value="100" title="Master Volume">
+            <span id="modal-volume-text" class="title-volume-text">100%</span>
+          </div>
+        </div>
         <div class="ctrl-section">
           <h3>🖥️ DESKTOP CONTROLS</h3>
           <ul>
-            <li><strong>Look Around:</strong> Move mouse cursor to screen edges</li>
-            <li><strong>Blast Doors:</strong> Press <kbd>Q</kbd> (Left) or <kbd>E</kbd> (Right), or click red wall buttons</li>
-            <li><strong>Doorway Lights:</strong> Press <kbd>A</kbd> (Left) or <kbd>D</kbd> (Right), or click white wall buttons</li>
-            <li><strong>Camera Monitor:</strong> Press <kbd>SPACE</kbd> / <kbd>S</kbd> or hover over bottom bar</li>
+            <li><strong>Look Around:</strong> Move mouse cursor toward screen edges</li>
+            <li><strong>Blast Doors:</strong> Click red wall buttons</li>
+            <li><strong>Doorway Lights:</strong> Click white wall buttons</li>
+            <li><strong>Camera Monitor:</strong> Press <kbd>SPACE</kbd> / <kbd>S</kbd> / <kbd>ESC</kbd> or hover over bottom bar</li>
             <li><strong>Switch Cameras:</strong> Click buttons on minimap (CAM 1A - 7)</li>
           </ul>
         </div>
         <div class="ctrl-section">
           <h3>📱 MOBILE CONTROLS</h3>
           <ul>
-            <li><strong>Look Around:</strong> Swipe / drag finger left or right on the screen</li>
+            <li><strong>Look Around:</strong> Swipe / drag finger left or right across the screen</li>
             <li><strong>Doors & Lights:</strong> Tap red and white wall buttons directly</li>
             <li><strong>Camera Monitor:</strong> Tap bottom bar ("CAMERA MONITOR")</li>
-            <li><strong>Pro Tip:</strong> Rotate your device to landscape for the best view</li>
+          </ul>
+        </div>
+        <div class="ctrl-section">
+          <h3>📱 HOW TO PLAY ON PHONE (REMOVE BROWSER BARS)</h3>
+          <p class="ctrl-tip">To hide the giant Safari/Chrome address bars that block your doors and cameras:</p>
+          <ul>
+            <li><strong>iPhone (Safari):</strong> Tap the <strong>Share</strong> button (box with arrow) ➔ <strong>"Add to Home Screen"</strong> ➔ Tap <strong>"Add"</strong> ➔ Open from your Home Screen!</li>
+            <li><strong>Android (Chrome):</strong> Tap <strong>Three Dots (⋮)</strong> ➔ <strong>"Add to Home screen"</strong> ➔ Open from your Home Screen!</li>
           </ul>
         </div>
         <div class="ctrl-section">
           <h3>⚠️ SURVIVAL TIPS</h3>
           <ul>
-            <li><strong>Trevor (Pirate Cove):</strong> Check CAM 1C often! If he sprints down CAM 2A, slam LEFT door!</li>
+            <li><strong>Trevor (Pirate Cove):</strong> Check CAM 1C often! If he sprints down CAM 2A, slam LEFT door immediately!</li>
             <li><strong>Chris (Freddy):</strong> Stalks in darkness and kitchen (CAM 6). Don't let power hit 0%!</li>
-            <li><strong>Spencer (Bonnie):</strong> Appears in left doorway. Check light with <kbd>A</kbd>!</li>
-            <li><strong>Daxon (Chica):</strong> Lurks outside right window. Check light with <kbd>D</kbd>!</li>
+            <li><strong>Spencer (Bonnie):</strong> Appears in left doorway. Check light on left wall!</li>
+            <li><strong>Daxon (Chica):</strong> Lurks outside right window. Check light on right wall!</li>
           </ul>
         </div>
       </div>
       <div class="controls-footer">
         <button id="btn-done-controls" class="start-btn">GOT IT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Idiot-Proof Mobile "Add to Home Screen" Modal -->
+  <div id="mobile-guide-modal" class="mobile-guide-modal hidden">
+    <div class="mobile-guide-box">
+      <button id="btn-close-mobile-guide" class="mobile-guide-close-btn" title="Close (Play in browser anyway)">✕</button>
+
+      <div class="mobile-guide-badge">⚠️ ATTENTION MOBILE PLAYERS</div>
+      <h2 class="mobile-guide-title">HOW TO PLAY ON PHONE</h2>
+      <p class="mobile-guide-lead">
+        If you play inside your browser, the <strong>giant Safari/Chrome address bars</strong> will block the doors, lights, and camera buttons!
+      </p>
+
+      <div class="mobile-steps-container">
+        <!-- iOS Safari Instructions -->
+        <div class="mobile-platform-card ios-card">
+          <div class="platform-header">
+            <span class="platform-icon">🍏</span>
+            <span class="platform-name">iPhone / iPad (Safari)</span>
+          </div>
+          <ol class="step-list">
+            <li>
+              <div class="step-num">1</div>
+              <div class="step-desc">Tap the <strong>Share</strong> button at the bottom of Safari (<span class="inline-icon share-box">⎋</span> square with arrow pointing UP).</div>
+            </li>
+            <li>
+              <div class="step-num">2</div>
+              <div class="step-desc">Scroll down and tap <strong>"Add to Home Screen"</strong> (<span class="inline-icon plus-icon">➕</span>).</div>
+            </li>
+            <li>
+              <div class="step-num">3</div>
+              <div class="step-desc">Tap <strong>"Add"</strong> in the top-right corner.</div>
+            </li>
+            <li>
+              <div class="step-num">4</div>
+              <div class="step-desc">Go to your phone's Home Screen, tap <strong>"FNAF Friends"</strong>, turn your phone sideways, and enjoy TRUE fullscreen with NO BARS!</div>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Android Chrome Instructions -->
+        <div class="mobile-platform-card android-card">
+          <div class="platform-header">
+            <span class="platform-icon">🤖</span>
+            <span class="platform-name">Android (Chrome)</span>
+          </div>
+          <ol class="step-list">
+            <li>
+              <div class="step-num">1</div>
+              <div class="step-desc">Tap the <strong>Three Dots (⋮)</strong> menu in the top-right corner of Chrome.</div>
+            </li>
+            <li>
+              <div class="step-num">2</div>
+              <div class="step-desc">Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</div>
+            </li>
+            <li>
+              <div class="step-num">3</div>
+              <div class="step-desc">Tap <strong>"Install"</strong>, then open the app icon from your Home Screen!</div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="mobile-guide-actions">
+        <button id="btn-guide-proceed-anyway" class="btn-guide-secondary">
+          Play in browser anyway (browser bars will block buttons) ➔
+        </button>
       </div>
     </div>
   </div>
@@ -286,6 +378,7 @@
 
         <!-- Bottom Right HUD: Authentic Camera Map & Buttons -->
         <div class="cam-map-wrapper">
+          <div id="cam-map-room-title" class="cam-map-room-title">Show Stage</div>
           <img class="cam-map-blueprint" src="assets/cameras/map_complete.png" alt="Pizzeria Map">
           <div class="you-indicator" style="left: 310px; top: 350px;" title="YOU">
             <span class="you-pulse"></span>
@@ -433,18 +526,6 @@
         <span class="cam-bar-text">CAMERA MONITOR</span>
       </div>
     </div>
-
-    <!-- Sleek minimal key hints (unobtrusive, clicks pass through) -->
-    <div class="minimal-controls-bar">
-      <div class="ctrl-chip"><kbd>Q</kbd> Left Door</div>
-      <div class="ctrl-chip"><kbd>A</kbd> Left Light</div>
-      <div class="ctrl-sep">|</div>
-      <div class="ctrl-chip"><kbd>SPACE</kbd> / <kbd>S</kbd> / <kbd>ESC</kbd> Camera</div>
-      <div class="ctrl-sep">|</div>
-      <div class="ctrl-chip"><kbd>D</kbd> Right Light</div>
-      <div class="ctrl-chip"><kbd>E</kbd> Right Door</div>
-    </div>
-
   </div><!-- #viewport -->
 
   <!-- Synchronous Headless Test Priming Script -->

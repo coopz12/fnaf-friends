@@ -185,15 +185,6 @@ class OfficeController {
     setupWallBtn(this.btnRightDoor, () => this.toggleRightDoor());
     setupWallBtn(this.btnLeftLight, () => this.toggleLeftLight());
     setupWallBtn(this.btnRightLight, () => this.toggleRightLight());
-
-    // Keyboard Shortcuts (Q: Left Door, A: Left Light, E: Right Door, D: Right Light)
-    window.addEventListener('keydown', (e) => {
-      const key = e.key.toLowerCase();
-      if (key === 'q') this.toggleLeftDoor();
-      else if (key === 'a') this.toggleLeftLight();
-      else if (key === 'e') this.toggleRightDoor();
-      else if (key === 'd') this.toggleRightLight();
-    });
   }
 
   /* ==========================================================================

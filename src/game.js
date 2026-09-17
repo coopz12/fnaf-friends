@@ -268,6 +268,88 @@ class GameManager {
     if (btnCloseControls) btnCloseControls.addEventListener('click', hideControls);
     if (btnDoneControls) btnDoneControls.addEventListener('click', hideControls);
 
+    // Master Volume Control Handlers
+    const titleVolSlider = document.getElementById('title-volume-slider');
+    const titleVolText = document.getElementById('title-volume-text');
+    const titleVolIcon = document.getElementById('title-vol-icon');
+    const modalVolSlider = document.getElementById('modal-volume-slider');
+    const modalVolText = document.getElementById('modal-volume-text');
+    const modalVolIcon = document.getElementById('modal-vol-icon');
+
+    const updateVolumeUI = (pct) => {
+      const rounded = Math.round(pct);
+      const icon = rounded === 0 ? '🔇' : (rounded < 50 ? '🔉' : '🔊');
+      if (titleVolSlider) titleVolSlider.value = rounded;
+      if (titleVolText) titleVolText.textContent = `${rounded}%`;
+      if (titleVolIcon) titleVolIcon.textContent = icon;
+      if (modalVolSlider) modalVolSlider.value = rounded;
+      if (modalVolText) modalVolText.textContent = `${rounded}%`;
+      if (modalVolIcon) modalVolIcon.textContent = icon;
+    };
+
+    const curVolPct = Math.round((window.soundEngine.getMasterVolume ? window.soundEngine.getMasterVolume() : 1.0) * 100);
+    updateVolumeUI(curVolPct);
+
+    const onVolInput = (e) => {
+      const val = parseFloat(e.target.value);
+      if (window.soundEngine.setMasterVolume) {
+        window.soundEngine.setMasterVolume(val / 100);
+      }
+      updateVolumeUI(val);
+    };
+
+    if (titleVolSlider) titleVolSlider.addEventListener('input', onVolInput);
+    if (modalVolSlider) modalVolSlider.addEventListener('input', onVolInput);
+
+    let lastVolumeBeforeMute = 100;
+    const toggleMute = () => {
+      const cur = window.soundEngine.getMasterVolume ? window.soundEngine.getMasterVolume() : 1.0;
+      if (cur > 0) {
+        lastVolumeBeforeMute = cur * 100;
+        window.soundEngine.setMasterVolume(0);
+        updateVolumeUI(0);
+      } else {
+        const restore = lastVolumeBeforeMute > 0 ? lastVolumeBeforeMute : 100;
+        window.soundEngine.setMasterVolume(restore / 100);
+        updateVolumeUI(restore);
+      }
+    };
+    if (titleVolIcon) titleVolIcon.addEventListener('click', toggleMute);
+    if (modalVolIcon) modalVolIcon.addEventListener('click', toggleMute);
+
+    // Mobile PWA / Add to Home Screen Guide Modal
+    const btnMobileGuide = document.getElementById('title-btn-mobile-guide');
+    const mobileGuideModal = document.getElementById('mobile-guide-modal');
+    const btnCloseMobileGuide = document.getElementById('btn-close-mobile-guide');
+    const btnGuideProceedAnyway = document.getElementById('btn-guide-proceed-anyway');
+
+    const openMobileGuide = () => {
+      window.soundEngine.playButtonClick();
+      if (mobileGuideModal) mobileGuideModal.classList.remove('hidden');
+    };
+
+    const closeMobileGuide = () => {
+      window.soundEngine.playButtonClick();
+      try { sessionStorage.setItem('fnaf_mobile_guide_dismissed', 'true'); } catch (e) {}
+      if (mobileGuideModal) mobileGuideModal.classList.add('hidden');
+      window.soundEngine.unlockAudio();
+      window.soundEngine.startTitleMusic();
+    };
+
+    if (btnMobileGuide) btnMobileGuide.addEventListener('click', openMobileGuide);
+    if (btnCloseMobileGuide) btnCloseMobileGuide.addEventListener('click', closeMobileGuide);
+    if (btnGuideProceedAnyway) btnGuideProceedAnyway.addEventListener('click', closeMobileGuide);
+
+    // Auto-pop mobile guide for mobile browser users (not standalone PWA)
+    try {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 1024);
+      const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+      const dismissed = sessionStorage.getItem('fnaf_mobile_guide_dismissed');
+      if (isMobile && !isStandalone && !dismissed && mobileGuideModal) {
+        mobileGuideModal.classList.remove('hidden');
+      }
+    } catch (e) {}
+
     // Reset Save Button
     const btnReset = document.getElementById('title-btn-reset');
     if (btnReset) {

@@ -655,15 +655,6 @@ class Office3D {
         this.handleObjectClick(clickedObj.name);
       }
     });
-
-    // Keyboard Shortcuts (Q, A, E, D)
-    window.addEventListener('keydown', (e) => {
-      const key = e.key.toLowerCase();
-      if (key === 'q') this.toggleLeftDoor();
-      else if (key === 'a') this.toggleLeftLight();
-      else if (key === 'e') this.toggleRightDoor();
-      else if (key === 'd') this.toggleRightLight();
-    });
   }
 
   handleObjectClick(name) {

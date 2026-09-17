@@ -863,45 +863,292 @@ html, body {
 }
 
 /* ==========================================================================
-   MINIMAL BOTTOM CONTROLS HINT BAR
+   VOLUME SLIDER WIDGET (Title Screen & Controls Modal)
    ========================================================================== */
 
-.minimal-controls-bar {
-  position: fixed;
-  bottom: 64px;
-  left: 50%;
-  transform: translateX(-50%);
+.title-volume-widget,
+.modal-volume-widget {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: rgba(10, 14, 20, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  padding: 6px 16px;
-  border-radius: 20px;
+  gap: 8px;
+}
+
+.title-vol-icon {
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.15s ease;
+}
+
+.title-vol-icon:hover {
+  transform: scale(1.15);
+}
+
+.title-volume-text {
+  font-family: 'Share Tech Mono', monospace;
   font-size: 12px;
-  color: #8c9cb0;
-  pointer-events: none;
-  z-index: 840;
+  color: #8c9eb4;
+  letter-spacing: 1px;
+  min-width: 36px;
+  text-align: right;
 }
 
-.ctrl-chip {
+/* Authentic FNAF-styled range slider */
+.fnaf-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 90px;
+  height: 6px;
+  background: #1c2432;
+  border: 1px solid #364254;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.fnaf-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--fnaf-yellow);
+  border: 2px solid #b89a00;
+  box-shadow: 0 0 6px rgba(255, 221, 51, 0.5);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.fnaf-volume-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 12px rgba(255, 221, 51, 0.85);
+}
+
+.fnaf-volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--fnaf-yellow);
+  border: 2px solid #b89a00;
+  box-shadow: 0 0 6px rgba(255, 221, 51, 0.5);
+  cursor: pointer;
+}
+
+/* Modal slider is wider */
+.fnaf-volume-slider.modal-slider {
+  width: 180px;
+  height: 8px;
+}
+
+.volume-ctrl-section .modal-volume-widget {
+  margin-top: 6px;
+}
+
+.ctrl-tip {
+  font-size: 13px;
+  color: #8899aa;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   MOBILE "ADD TO HOME SCREEN" GUIDE MODAL
+   ========================================================================== */
+
+.mobile-guide-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2300;
+  background: rgba(0, 0, 0, 0.96);
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
 }
 
-.ctrl-chip kbd {
-  background: #1c2330;
-  border: 1px solid #364254;
+.mobile-guide-modal.hidden {
+  display: none;
+}
+
+.mobile-guide-box {
+  position: relative;
+  background: #0d1117;
+  border: 2px solid #ffdd33;
+  border-radius: 10px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 94vh;
+  max-height: 94dvh;
+  overflow-y: auto;
+  padding: 32px 28px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 221, 51, 0.2);
+}
+
+.mobile-guide-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: #7b8b9f;
+  font-size: 26px;
+  cursor: pointer;
+  padding: 4px 8px;
+  z-index: 5;
+  transition: color 0.15s ease;
+}
+
+.mobile-guide-close-btn:hover {
+  color: #ff4444;
+}
+
+.mobile-guide-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
   color: var(--fnaf-yellow);
-  padding: 2px 6px;
-  border-radius: 3px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.mobile-guide-title {
+  font-family: 'VT323', monospace;
+  font-size: 36px;
+  letter-spacing: 3px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.mobile-guide-lead {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  color: #aab7c8;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.mobile-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.mobile-platform-card {
+  background: #131920;
+  border: 1px solid #232e3d;
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+
+.platform-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.platform-icon {
+  font-size: 22px;
+}
+
+.platform-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  color: #e0e8f0;
+}
+
+.step-list {
+  list-style: none;
+  counter-reset: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  margin: 0;
+}
+
+.step-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--fnaf-green);
+  color: #000;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+}
+
+.step-desc {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  color: #bac7d8;
+  line-height: 1.5;
+  padding-top: 4px;
+}
+
+.inline-icon {
   font-weight: bold;
 }
 
-.ctrl-sep {
-  color: rgba(255, 255, 255, 0.15);
+.mobile-guide-actions {
+  text-align: center;
+}
+
+.btn-guide-secondary {
+  background: #1b2432;
+  border: 1px solid #405572;
+  color: #8899aa;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-guide-secondary:hover {
+  background: #253347;
+  color: #fff;
+  border-color: #628bc4;
+}
+
+/* ==========================================================================
+   CAMERA MAP ROOM TITLE (Dynamic label above minimap)
+   ========================================================================== */
+
+.cam-map-room-title {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'VT323', monospace;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 6px #000, 0 0 12px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  z-index: 625;
+  pointer-events: none;
+  line-height: 1.2;
 }
 
 /* ==========================================================================
@@ -967,12 +1214,13 @@ html, body {
 /* Top Left HUD */
 .cam-hud-topleft {
   position: absolute;
-  top: 36px;
+  top: max(36px, env(safe-area-inset-top, 0px));
   left: 45px;
   z-index: 620;
   pointer-events: none;
   font-family: 'Share Tech Mono', monospace;
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.95), 0 0 4px #000;
+  line-height: 1.25;
 }
 
 .cam-rec-indicator {
@@ -1836,8 +2084,9 @@ html, body {
     margin-top: 2px;
   }
   .cam-hud-topleft {
-    top: 8px;
+    top: max(8px, env(safe-area-inset-top, 0px));
     left: 12px;
+    line-height: 1.25;
   }
   .cam-rec-indicator {
     font-size: 13px;
@@ -1850,9 +2099,38 @@ html, body {
     font-size: 12px;
   }
 
-  /* 7. Hide keyboard hints on mobile devices */
-  .minimal-controls-bar {
-    display: none;
+  /* 7. Mobile Guide Modal compact scaling */
+  .mobile-guide-box {
+    padding: 16px 14px;
+  }
+  .mobile-guide-title {
+    font-size: 22px;
+  }
+  .mobile-guide-lead {
+    font-size: 12px;
+    margin-bottom: 14px;
+  }
+  .mobile-platform-card {
+    padding: 10px 12px;
+  }
+  .step-num {
+    width: 22px;
+    height: 22px;
+    font-size: 14px;
+  }
+  .step-desc {
+    font-size: 11px;
+  }
+  .btn-guide-secondary {
+    font-size: 11px;
+    padding: 8px 14px;
+  }
+  /* Volume slider compact on mobile */
+  .fnaf-volume-slider {
+    width: 70px;
+  }
+  .fnaf-volume-slider.modal-slider {
+    width: 120px;
   }
 
   /* 8. Custom Night modal scaling */
