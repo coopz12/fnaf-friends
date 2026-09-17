@@ -633,12 +633,13 @@ html, body {
 .wall-panel {
   position: absolute;
   top: 32.5%;
-  z-index: 50;
+  z-index: 60;
   width: calc(100% * (92 / 1600));
   height: calc(100% * (247 / 720));
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
+  cursor: pointer;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
 }
 
@@ -660,8 +661,8 @@ html, body {
 
 .wall-panel-hitbox {
   position: absolute;
-  left: 12%;
-  width: 76%;
+  left: 0;
+  width: 100%;
   background: transparent;
   border: none;
   outline: none;
@@ -669,17 +670,18 @@ html, body {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   z-index: 2;
-  border-radius: 4px;
+  margin: 0;
+  padding: 0;
 }
 
 .wall-panel-hitbox.hitbox-door {
-  top: 15%;
-  height: 34%;
+  top: 0;
+  height: 50%;
 }
 
 .wall-panel-hitbox.hitbox-light {
-  top: 54%;
-  height: 34%;
+  top: 50%;
+  height: 50%;
 }
 
 .wall-panel-hitbox:hover {
@@ -687,7 +689,7 @@ html, body {
 }
 
 .wall-panel-hitbox:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .wall-panel.jammed {
@@ -1967,7 +1969,9 @@ html, body {
 
   /* 3. Wall control panels (Doors & Lights) */
   .wall-panel {
-    top: 30%;
+    top: 28%;
+    width: max(calc(100% * (105 / 1600)), 65px);
+    height: max(calc(100% * (280 / 720)), 175px);
   }
 
   /* 4. Bottom camera monitor flip bar elevated above iPhone home gesture bar */

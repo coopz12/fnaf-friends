@@ -92,14 +92,24 @@ class OfficeController {
   }
 
   setupEvents() {
-    // Mouse movement: smooth panoramic glide across office
+    // Mouse movement: smooth panoramic glide across office with authentic FNAF 1 edge docking
     window.addEventListener('mousemove', (e) => {
       const viewWidth = window.innerWidth;
       const stageWidth = this.stage.offsetWidth;
       const maxPan = stageWidth - viewWidth;
 
       if (maxPan > 0) {
-        const norm = Math.min(Math.max(e.clientX / viewWidth, 0), 1);
+        const rawNorm = Math.min(Math.max(e.clientX / viewWidth, 0), 1);
+        // Authentic FNAF 1 edge docking: left 15% docks solidly at 0, right 15% docks solidly at -maxPan
+        const edgeZone = 0.15;
+        let norm;
+        if (rawNorm <= edgeZone) {
+          norm = 0;
+        } else if (rawNorm >= 1 - edgeZone) {
+          norm = 1;
+        } else {
+          norm = (rawNorm - edgeZone) / (1 - 2 * edgeZone);
+        }
         this.targetPanX = - (norm * maxPan);
       }
     });
@@ -110,8 +120,8 @@ class OfficeController {
     let touchStartPan = 0;
 
     window.addEventListener('touchstart', (e) => {
-      // Don't drag if user taps interactive buttons
-      if (e.target.closest('.wall-btn, .cam-btn, .cam-monitor-bar, button, .custom-btn, .step-btn')) {
+      // Don't drag if user taps interactive buttons or wall control panels
+      if (e.target.closest('.wall-btn, .wall-panel, .wall-panel-hitbox, .wall-panel-sprite, .cam-btn, .cam-monitor-bar, button, .custom-btn, .step-btn')) {
         return;
       }
       if (e.touches.length === 1) {
@@ -154,14 +164,28 @@ class OfficeController {
 
     // Wall Buttons Click (supports both mouse click and instant mobile touch)
     const setupWallBtn = (btn, action) => {
+      if (!btn) return;
       let touchStartX = 0;
       let touchStartY = 0;
-      let lastTouch = 0;
+      let touchStartTime = 0;
+      let lastTrigger = 0;
+
+      const triggerAction = (e) => {
+        const now = Date.now();
+        if (now - lastTrigger < 280) return;
+        lastTrigger = now;
+        if (e) {
+          if (e.stopPropagation) e.stopPropagation();
+          if (e.cancelable && e.preventDefault) e.preventDefault();
+        }
+        action();
+      };
 
       btn.addEventListener('touchstart', (e) => {
         if (e.touches && e.touches[0]) {
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
+          touchStartTime = Date.now();
         }
       }, { passive: true });
 
@@ -169,18 +193,15 @@ class OfficeController {
         if (e.changedTouches && e.changedTouches[0]) {
           const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
           const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
-          if (dx > 20 || dy > 20) return;
+          const dt = Date.now() - touchStartTime;
+          // Generous 45px thumb tap tolerance for mobile screens
+          if (dx > 45 || dy > 45 || dt > 650) return;
         }
-        lastTouch = Date.now();
-        e.stopPropagation();
-        e.preventDefault();
-        action();
+        triggerAction(e);
       }, { passive: false });
 
       btn.addEventListener('click', (e) => {
-        if (Date.now() - lastTouch < 450) return;
-        e.stopPropagation();
-        action();
+        triggerAction(e);
       });
     };
 
@@ -188,6 +209,58 @@ class OfficeController {
     setupWallBtn(this.btnRightDoor, () => this.toggleRightDoor());
     setupWallBtn(this.btnLeftLight, () => this.toggleLeftLight());
     setupWallBtn(this.btnRightLight, () => this.toggleRightLight());
+
+    // Delegated Panel Fallback: tapping anywhere on panel triggers top half (door) or bottom half (light)
+    const setupPanelDelegation = (panelId, toggleDoor, toggleLight) => {
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+      let pStartX = 0;
+      let pStartY = 0;
+      let pStartTime = 0;
+      let pLastTrigger = 0;
+
+      const handlePanelAt = (clientY, e) => {
+        const now = Date.now();
+        if (now - pLastTrigger < 280) return;
+        pLastTrigger = now;
+        if (e && e.stopPropagation) e.stopPropagation();
+        const r = panel.getBoundingClientRect();
+        const relY = clientY - r.top;
+        if (relY < r.height * 0.5) {
+          toggleDoor();
+        } else {
+          toggleLight();
+        }
+      };
+
+      panel.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          pStartX = e.touches[0].clientX;
+          pStartY = e.touches[0].clientY;
+          pStartTime = Date.now();
+        }
+      }, { passive: true });
+
+      panel.addEventListener('touchend', (e) => {
+        if (e.target.tagName === 'BUTTON') return; // Handled by button
+        if (e.changedTouches && e.changedTouches[0]) {
+          const dx = Math.abs(e.changedTouches[0].clientX - pStartX);
+          const dy = Math.abs(e.changedTouches[0].clientY - pStartY);
+          const dt = Date.now() - pStartTime;
+          if (dx > 45 || dy > 45 || dt > 650) return;
+          if (e.cancelable) e.preventDefault();
+          handlePanelAt(e.changedTouches[0].clientY, e);
+        }
+      }, { passive: false });
+
+      panel.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') return; // Handled by button
+        handlePanelAt(e.clientY, e);
+      });
+    };
+
+    setupPanelDelegation('left-wall-panel', () => this.toggleLeftDoor(), () => this.toggleLeftLight());
+    setupPanelDelegation('right-wall-panel', () => this.toggleRightDoor(), () => this.toggleRightLight());
   }
 
   /* ==========================================================================
