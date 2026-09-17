@@ -1138,7 +1138,7 @@ html, body {
   display: none;
 }
 
-/* Interactive Camera Buttons */
+/* Interactive Camera Buttons (Authentic FNAF 1 Look) */
 .cam-btn {
   position: absolute;
   width: 52px;
@@ -1146,34 +1146,33 @@ html, body {
   background: transparent;
   border: none;
   color: transparent;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.1s ease;
+  transition: background 0.1s ease;
   z-index: 630;
+  box-shadow: none;
+}
+
+.cam-btn .btn-text {
+  display: none;
 }
 
 .cam-btn:hover {
-  background: rgba(50, 240, 56, 0.2);
-  border: 1px solid rgba(50, 240, 56, 0.5);
-  box-shadow: 0 0 10px rgba(50, 240, 56, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  mix-blend-mode: lighten;
+  border: none;
+  box-shadow: none;
 }
 
 .cam-btn.active {
-  background: #18981e;
-  border: 2px solid #32f038;
-  color: #fff;
-  box-shadow: 0 0 14px rgba(50, 240, 56, 0.9), inset 0 0 6px rgba(255, 255, 255, 0.4);
-  text-shadow: 0 0 4px #000;
-}
-
-.btn-text {
-  pointer-events: none;
+  background: #1e852c;
+  mix-blend-mode: lighten;
+  border: none;
+  color: transparent;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 /* Tablet Animation Overlay */
@@ -1317,16 +1316,8 @@ html, body {
    CREEPY HALLUCINATIONS ("IT'S ME")
    ========================================================================== */
 .hallucination-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1800;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
+  display: none !important;
 }
-.hallucination-overlay.hidden { display: none; }
 
 .hallucination-overlay img {
   width: 100%;
@@ -1803,11 +1794,11 @@ html, body {
     right: 6px;
     bottom: 30px;
   }
-  /* Enlarge touch targets on miniature camera map buttons */
+  /* Enlarge touch targets on miniature camera map buttons without overlapping adjacent buttons */
   .cam-btn::after {
     content: '';
     position: absolute;
-    inset: -8px;
+    inset: -3px -6px;
     z-index: 10;
   }
 

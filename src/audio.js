@@ -58,7 +58,10 @@ class SoundEngine {
 
   unlockAudio() {
     try {
-      this.getAudioContext();
+      const ctx = this.getAudioContext();
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
     } catch (e) {}
   }
 
@@ -71,9 +74,16 @@ class SoundEngine {
       }
       if (this.titleAudio.paused) {
         const p = this.titleAudio.play();
-        if (p && p.catch) p.catch(() => {});
+        if (p && p.catch) {
+          p.catch(() => {
+            // If iOS Safari rejects autoplay, reset instance so next user gesture creates a fresh Audio element
+            this.titleAudio = null;
+          });
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      this.titleAudio = null;
+    }
   }
 
   stopTitleMusic() {

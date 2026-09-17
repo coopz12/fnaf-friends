@@ -543,30 +543,14 @@ class CameraController {
       return;
     }
 
-    const currentSwitchId = ++this.camSwitchId;
-
-    // Immediately hide previous room so it NEVER lingers while new room is loading/decoding
-    if (this.currentFeedSrc !== feedSrc) {
-      this.camFeedImg.style.opacity = '0';
-    }
-
     const targetSrc = feedSrc;
-    const pre = (this.preloadedImages && this.preloadedImages[targetSrc]) ? this.preloadedImages[targetSrc] : new Image();
-    if (!pre.src) pre.src = targetSrc;
-
-    const commitFeed = () => {
-      // Discard stale asynchronous load if player switched cameras again
-      if (this.camSwitchId !== currentSwitchId) return;
-      this.currentFeedSrc = targetSrc;
+    this.currentFeedSrc = targetSrc;
+    if (this.camFeedImg) {
       this.camFeedImg.src = targetSrc;
       this.camFeedImg.style.opacity = '1';
-    };
-
-    if (pre.complete && pre.naturalWidth > 0) {
-      commitFeed();
-    } else {
-      pre.onload = commitFeed;
-      pre.onerror = commitFeed;
+      if (this.camFeedImg.decode) {
+        this.camFeedImg.decode().catch(() => {});
+      }
     }
   }
 

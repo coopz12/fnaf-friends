@@ -191,17 +191,16 @@ class GameManager {
       } catch (e) {}
     };
 
-    // Unlock Web Audio & try landscape orientation lock on first user interaction anywhere
-    const unlockOnFirstTouch = () => {
+    // Unlock Web Audio & try landscape orientation lock on any user interaction while on title screen
+    const ensureTitleAudio = () => {
       window.soundEngine.unlockAudio();
-      window.soundEngine.startTitleMusic();
       tryLockLandscape();
-      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(evt => {
-        window.removeEventListener(evt, unlockOnFirstTouch);
-      });
+      if (this.titleScreen && !this.titleScreen.classList.contains('hidden') && !this.isRunning) {
+        window.soundEngine.startTitleMusic();
+      }
     };
-    ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(evt => {
-      window.addEventListener(evt, unlockOnFirstTouch, { passive: true });
+    ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'click', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, ensureTitleAudio, { passive: true });
     });
 
     // Initial audio attempt
@@ -824,7 +823,6 @@ class GameManager {
 
     this.startClockAndPower();
     this.startAIMovementLoop();
-    this.startHallucinationLoop();
 
     // Start Phone Guy call on Nights 1 to 4
     if ([1, 2, 3, 4].includes(this.currentNight)) {
@@ -1538,54 +1536,15 @@ class GameManager {
      CREEPY HALLUCINATIONS & "IT'S ME"
      ========================================================================== */
   startHallucinationLoop() {
-    if (this.hallucinationInterval) clearInterval(this.hallucinationInterval);
-    this.hallucinationInterval = setInterval(() => {
-      if (!this.isRunning || this.isPowerOut || this.isGameOver) return;
-      // 20% chance every 22 seconds
-      if (Math.random() < 0.20) {
-        this.triggerHallucination();
-      }
-    }, 22000);
+    // Completely removed per user request
+    if (this.hallucinationInterval) {
+      clearInterval(this.hallucinationInterval);
+      this.hallucinationInterval = null;
+    }
   }
 
   triggerHallucination() {
-    if (!this.isRunning || this.isGameOver || this.isPowerOut) return;
-
-    const overlay = document.getElementById('hallucination-overlay');
-    const img = document.getElementById('hallucination-img');
-    const text = overlay ? overlay.querySelector('.hallucination-text') : null;
-    if (!overlay || !img) return;
-
-    const creepyImages = [
-      'assets/friends/chris_seahawks_scream.jpg',
-      'assets/friends/trevor_blue_eyes_nobg.png',
-      'assets/friends/trevor_death_stare.jpg',
-      'assets/friends/spencer_pucker.jpg',
-      'assets/friends/daxon_fisheye.jpg'
-    ];
-
-    const pick = creepyImages[Math.floor(Math.random() * creepyImages.length)];
-    img.src = pick;
-
-    if (text) {
-      text.style.display = (Math.random() < 0.6) ? 'block' : 'none';
-    }
-
-    // Audio stutter glitch
-    window.soundEngine.playHallucinationGlitch();
-
-    // Rapid double-flash
-    overlay.classList.remove('hidden');
-    this.scheduleTimeout(() => {
-      overlay.classList.add('hidden');
-      this.scheduleTimeout(() => {
-        if (this.isGameOver) return;
-        overlay.classList.remove('hidden');
-        this.scheduleTimeout(() => {
-          overlay.classList.add('hidden');
-        }, 80);
-      }, 40);
-    }, 70);
+    // Completely removed per user request
   }
 
   /* ==========================================================================
@@ -1629,11 +1588,6 @@ class GameManager {
       const friend = (this.friends.daxon.currentRoom === 'in_office') ? this.friends.daxon : this.friends.chris;
       this.triggerJumpscare(friend);
       return;
-    }
-
-    // Occasional creepy hallucination flash upon putting monitor down (8% chance)
-    if (Math.random() < 0.08) {
-      this.triggerHallucination();
     }
   }
 
