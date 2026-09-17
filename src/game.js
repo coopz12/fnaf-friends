@@ -317,49 +317,6 @@ class GameManager {
     if (titleVolIcon) titleVolIcon.addEventListener('click', toggleMute);
     if (modalVolIcon) modalVolIcon.addEventListener('click', toggleMute);
 
-    // Mobile PWA / Add to Home Screen Guide Modal
-    const btnMobileGuide = document.getElementById('title-btn-mobile-guide');
-    const portraitBtnMobileGuide = document.getElementById('portrait-btn-mobile-guide');
-    const mobileGuideModal = document.getElementById('mobile-guide-modal');
-    const btnCloseMobileGuide = document.getElementById('btn-close-mobile-guide');
-    const btnGuideProceedAnyway = document.getElementById('btn-guide-proceed-anyway');
-
-    // Detect if user is actually on a mobile device
-    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-
-    // Only show the "PLAY ON MOBILE" button on actual mobile devices
-    if (isMobileDevice && btnMobileGuide) {
-      btnMobileGuide.classList.remove('hidden');
-    }
-
-    const openMobileGuide = () => {
-      window.soundEngine.playButtonClick();
-      if (mobileGuideModal) mobileGuideModal.classList.remove('hidden');
-    };
-
-    const closeMobileGuide = () => {
-      window.soundEngine.playButtonClick();
-      try { localStorage.setItem('fnaf_mobile_guide_dismissed', 'true'); } catch (e) {}
-      if (mobileGuideModal) mobileGuideModal.classList.add('hidden');
-      window.soundEngine.unlockAudio();
-      window.soundEngine.startTitleMusic();
-    };
-
-    if (btnMobileGuide) btnMobileGuide.addEventListener('click', openMobileGuide);
-    if (portraitBtnMobileGuide) portraitBtnMobileGuide.addEventListener('click', openMobileGuide);
-    if (btnCloseMobileGuide) btnCloseMobileGuide.addEventListener('click', closeMobileGuide);
-    if (btnGuideProceedAnyway) btnGuideProceedAnyway.addEventListener('click', closeMobileGuide);
-
-    // Auto-pop mobile guide ONLY on title screen for mobile browser users (not standalone PWA)
-    // Uses localStorage so it only shows once ever (not every session)
-    try {
-      const dismissed = localStorage.getItem('fnaf_mobile_guide_dismissed');
-      if (isMobileDevice && !isStandalone && !dismissed && mobileGuideModal) {
-        mobileGuideModal.classList.remove('hidden');
-      }
-    } catch (e) {}
-
     // Reset Save Button
     const btnReset = document.getElementById('title-btn-reset');
     if (btnReset) {
@@ -773,6 +730,7 @@ class GameManager {
       this.poweroutMusic = null;
     }
     window.soundEngine.stopRunning();
+    window.soundEngine.stopSound('door_bang');
     window.soundEngine.stopLoop('fan');
     window.soundEngine.stopLoop('ambience');
     window.soundEngine.setLightHum('left', false);
@@ -1049,7 +1007,7 @@ class GameManager {
           trevor.coveStage = 4;
           trevor.isSprinting = true;
           trevor.currentRoom = '2A';
-          trevor.sprintTimeRemaining = 2.5; // ~2.5s sprint window matching running audio
+          trevor.sprintTimeRemaining = 2.57; // Exact 2.57s duration of authentic FNAF 1 run.wav
           window.soundEngine.playRunning();
 
           if (this.cameras && this.cameras.isOpen) {
@@ -1130,6 +1088,7 @@ class GameManager {
       if (this.friends.trevor.isBanging) {
         this.friends.trevor.isBanging = false;
         window.soundEngine.stopRunning();
+        window.soundEngine.stopSound('door_bang');
         this.triggerJumpscare(this.friends.trevor);
       }
     }
@@ -1190,9 +1149,10 @@ class GameManager {
 
         if (this.office.leftDoorClosed) {
           // Left door was closed in time! Foxy bangs repeatedly on the metal door!
-          window.soundEngine.play('door_bang', 0.95);
+          window.soundEngine.stopSound('door_bang');
+          window.soundEngine.play('door_bang', 1.0);
           trevor.isBanging = true;
-          trevor.bangTimer = 3.2; // Knocks duration: door cannot be safely opened until this expires!
+          trevor.bangTimer = 3.32; // Exact duration of authentic FNAF 1 knock2.mp3!
           trevor.currentRoom = 'left_door';
           trevor.doorWaitSeconds = 0;
 
@@ -1205,6 +1165,7 @@ class GameManager {
           }
         } else {
           // Door was open! Instant jumpscare!
+          window.soundEngine.stopSound('door_bang');
           this.triggerJumpscare(trevor);
           return;
         }
@@ -1216,13 +1177,14 @@ class GameManager {
       // If player opens door while he is banging: instant jumpscare!
       if (!this.office.leftDoorClosed) {
         trevor.isBanging = false;
+        window.soundEngine.stopSound('door_bang');
         this.triggerJumpscare(trevor);
         return;
       }
 
       trevor.bangTimer -= delta;
       if (trevor.bangTimer <= 0) {
-        // Banging is complete! Now it's safe to open the door!
+        // Banging is complete! Foxy retreats back to Pirate Cove just like in the original game!
         trevor.isBanging = false;
         trevor.currentRoom = '1C'; // Trevor retreats back to Pirate Cove
         trevor.coveStage = 1;

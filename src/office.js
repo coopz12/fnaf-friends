@@ -18,6 +18,7 @@ class OfficeController {
     this.btnLeftLight = document.getElementById('btn-left-light');
     this.ledLeftDoor = document.getElementById('led-left-door');
     this.ledLeftLight = document.getElementById('led-left-light');
+    this.panelLeftImg = document.getElementById('img-panel-left');
 
     // Right Controls
     this.rightDoorContainer = document.getElementById('right-door-container');
@@ -26,6 +27,7 @@ class OfficeController {
     this.btnRightLight = document.getElementById('btn-right-light');
     this.ledRightDoor = document.getElementById('led-right-door');
     this.ledRightLight = document.getElementById('led-right-light');
+    this.panelRightImg = document.getElementById('img-panel-right');
 
     // HUD Elements
     this.powerPercentEl = document.getElementById('power-percent');
@@ -85,6 +87,7 @@ class OfficeController {
     this.stage.style.transform = `translate3d(${this.currentPanX.toFixed(2)}px, -50%, 0)`;
 
     this.setupEvents();
+    this.updatePanelTextures();
     this.startRenderLoop();
   }
 
@@ -196,7 +199,8 @@ class OfficeController {
       return;
     }
     this.leftDoorClosed = !this.leftDoorClosed;
-    this.ledLeftDoor.classList.toggle('active', this.leftDoorClosed);
+    if (this.ledLeftDoor) this.ledLeftDoor.classList.toggle('active', this.leftDoorClosed);
+    this.updatePanelTextures();
 
     if (this.leftDoorClosed) {
       window.soundEngine.playDoorSlam();
@@ -221,7 +225,8 @@ class OfficeController {
       return;
     }
     this.rightDoorClosed = !this.rightDoorClosed;
-    this.ledRightDoor.classList.toggle('active', this.rightDoorClosed);
+    if (this.ledRightDoor) this.ledRightDoor.classList.toggle('active', this.rightDoorClosed);
+    this.updatePanelTextures();
 
     if (this.rightDoorClosed) {
       window.soundEngine.playDoorSlam();
@@ -327,12 +332,13 @@ class OfficeController {
     // If right light is on, turn it off first
     if (this.rightLightOn) {
       this.rightLightOn = false;
-      this.ledRightLight.classList.remove('active');
+      if (this.ledRightLight) this.ledRightLight.classList.remove('active');
       window.soundEngine.setLightHum('right', false);
     }
 
     this.leftLightOn = !this.leftLightOn;
-    this.ledLeftLight.classList.toggle('active', this.leftLightOn);
+    if (this.ledLeftLight) this.ledLeftLight.classList.toggle('active', this.leftLightOn);
+    this.updatePanelTextures();
     window.soundEngine.setLightHum('left', this.leftLightOn);
 
     if (this.leftLightOn) {
@@ -364,12 +370,13 @@ class OfficeController {
     // If left light is on, turn it off first
     if (this.leftLightOn) {
       this.leftLightOn = false;
-      this.ledLeftLight.classList.remove('active');
+      if (this.ledLeftLight) this.ledLeftLight.classList.remove('active');
       window.soundEngine.setLightHum('left', false);
     }
 
     this.rightLightOn = !this.rightLightOn;
-    this.ledRightLight.classList.toggle('active', this.rightLightOn);
+    if (this.ledRightLight) this.ledRightLight.classList.toggle('active', this.rightLightOn);
+    this.updatePanelTextures();
     window.soundEngine.setLightHum('right', this.rightLightOn);
 
     if (this.rightLightOn) {
@@ -395,18 +402,44 @@ class OfficeController {
     this.updateUsageDisplay();
   }
 
+  updatePanelTextures() {
+    if (this.panelLeftImg) {
+      if (this.leftDoorClosed && this.leftLightOn) {
+        this.panelLeftImg.src = 'assets/office/panel_left_both.png';
+      } else if (this.leftDoorClosed && !this.leftLightOn) {
+        this.panelLeftImg.src = 'assets/office/panel_left_door.png';
+      } else if (!this.leftDoorClosed && this.leftLightOn) {
+        this.panelLeftImg.src = 'assets/office/panel_left_light.png';
+      } else {
+        this.panelLeftImg.src = 'assets/office/panel_left_off.png';
+      }
+    }
+    if (this.panelRightImg) {
+      if (this.rightDoorClosed && this.rightLightOn) {
+        this.panelRightImg.src = 'assets/office/panel_right_both.png';
+      } else if (this.rightDoorClosed && !this.rightLightOn) {
+        this.panelRightImg.src = 'assets/office/panel_right_door.png';
+      } else if (!this.rightDoorClosed && this.rightLightOn) {
+        this.panelRightImg.src = 'assets/office/panel_right_light.png';
+      } else {
+        this.panelRightImg.src = 'assets/office/panel_right_off.png';
+      }
+    }
+  }
+
   setJammed(side, isJammed) {
     if (side === 'left') {
       this.leftJammed = isJammed;
-      this.btnLeftDoor.classList.toggle('jammed', isJammed);
-      this.btnLeftLight.classList.toggle('jammed', isJammed);
+      const panel = document.getElementById('left-wall-panel');
+      if (panel) panel.classList.toggle('jammed', isJammed);
       if (isJammed && this.leftLightOn) this.toggleLeftLight();
     } else if (side === 'right') {
       this.rightJammed = isJammed;
-      this.btnRightDoor.classList.toggle('jammed', isJammed);
-      this.btnRightLight.classList.toggle('jammed', isJammed);
+      const panel = document.getElementById('right-wall-panel');
+      if (panel) panel.classList.toggle('jammed', isJammed);
       if (isJammed && this.rightLightOn) this.toggleRightLight();
     }
+    this.updatePanelTextures();
   }
 
   /* ==========================================================================

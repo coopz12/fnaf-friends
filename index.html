@@ -38,7 +38,6 @@
       <p class="rotate-tip"><strong style="color:#39ff14;">iPhone:</strong> Tap Share (⎋) → "Add to Home Screen" → "Add"</p>
       <p class="rotate-tip"><strong style="color:#39ff14;">Android:</strong> Tap ⋮ menu → "Add to Home screen" → "Install"</p>
       <p class="rotate-tip" style="margin-top:10px;">Open from your Home Screen and hold your phone sideways to play.</p>
-      <button id="portrait-btn-mobile-guide" class="title-action-btn" type="button">ADD TO HOME SCREEN</button>
     </div>
   </div>
 
@@ -94,9 +93,6 @@
       <div class="title-actions">
         <button id="title-btn-controls" class="title-action-btn">
           <span class="action-icon">🎮</span> CONTROLS
-        </button>
-        <button id="title-btn-mobile-guide" class="title-action-btn hidden" title="Install this game on your Home Screen">
-          ADD TO HOME SCREEN
         </button>
         <button id="title-btn-reset" class="title-action-btn title-reset-btn" title="Reset Night Progression">
           <span>↺</span> RESET SAVE
@@ -290,28 +286,22 @@
         <img id="right-door-img" class="door-frame-img right-door-sprite" src="assets/doors/door_right_sheet.png" alt="Right Door">
       </div>
 
-      <!-- Left Wall Control Panel -->
-      <div class="wall-panel left-wall-panel">
-        <button id="btn-left-door" class="wall-btn btn-door-toggle" title="Left Door (Q)">
-          <span class="btn-led red-led" id="led-left-door"></span>
-          <span class="btn-label">DOOR</span>
-        </button>
-        <button id="btn-left-light" class="wall-btn btn-light-toggle" title="Left Light (A)">
-          <span class="btn-led white-led" id="led-left-light"></span>
-          <span class="btn-label">LIGHT</span>
-        </button>
+      <!-- Authentic FNAF 1 Left Wall Control Panel -->
+      <div id="left-wall-panel" class="wall-panel left-wall-panel">
+        <img id="img-panel-left" class="wall-panel-sprite" src="assets/office/panel_left_off.png" alt="Left Door Controls">
+        <button id="btn-left-door" class="wall-panel-hitbox hitbox-door" title="Left Door" aria-label="Left Door"></button>
+        <button id="btn-left-light" class="wall-panel-hitbox hitbox-light" title="Left Light" aria-label="Left Light"></button>
+        <span class="btn-led red-led hidden" id="led-left-door"></span>
+        <span class="btn-led white-led hidden" id="led-left-light"></span>
       </div>
 
-      <!-- Right Wall Control Panel -->
-      <div class="wall-panel right-wall-panel">
-        <button id="btn-right-door" class="wall-btn btn-door-toggle" title="Right Door (E)">
-          <span class="btn-led red-led" id="led-right-door"></span>
-          <span class="btn-label">DOOR</span>
-        </button>
-        <button id="btn-right-light" class="wall-btn btn-light-toggle" title="Right Light (D)">
-          <span class="btn-led white-led" id="led-right-light"></span>
-          <span class="btn-label">LIGHT</span>
-        </button>
+      <!-- Authentic FNAF 1 Right Wall Control Panel -->
+      <div id="right-wall-panel" class="wall-panel right-wall-panel">
+        <img id="img-panel-right" class="wall-panel-sprite" src="assets/office/panel_right_off.png" alt="Right Door Controls">
+        <button id="btn-right-door" class="wall-panel-hitbox hitbox-door" title="Right Door" aria-label="Right Door"></button>
+        <button id="btn-right-light" class="wall-panel-hitbox hitbox-light" title="Right Light" aria-label="Right Light"></button>
+        <span class="btn-led red-led hidden" id="led-right-door"></span>
+        <span class="btn-led white-led hidden" id="led-right-light"></span>
       </div>
 
       <!-- Friend Doorway Silhouette Containers (For when Trevor, Chris, Spencer, Daxon appear!) -->
@@ -519,12 +509,11 @@
       </div>
     </div>
 
-    <!-- Authentic Camera Monitor Hover / Flip Bar at Bottom -->
-    <div id="cam-monitor-bar" class="cam-monitor-bar">
-      <div class="cam-bar-handle">
-        <span class="cam-bar-icon">▲</span>
-        <span class="cam-bar-text">CAMERA MONITOR</span>
-      </div>
+    <!-- Authentic FNAF 1 Camera Monitor Flip Bar -->
+    <div id="cam-monitor-bar" class="cam-monitor-bar" role="button" aria-label="Camera Monitor">
+      <img id="cam-bar-img" class="cam-bar-img" src="assets/cameras/cam_bar.png" alt="Camera Monitor Bar">
+      <span class="cam-bar-icon hidden"></span>
+      <span class="cam-bar-text hidden"></span>
     </div>
   </div><!-- #viewport -->
 
