@@ -958,7 +958,7 @@ html, body {
 .mobile-guide-modal {
   position: fixed;
   inset: 0;
-  z-index: 2300;
+  z-index: 1000000;
   background: rgba(0, 0, 0, 0.96);
   display: flex;
   align-items: center;

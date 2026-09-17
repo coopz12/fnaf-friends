@@ -29,16 +29,16 @@
   <!-- Force Horizontal / Landscape Orientation Overlay for Mobile -->
   <div id="rotate-device-overlay" class="rotate-device-overlay">
     <div class="rotate-device-box">
-      <div class="rotate-phone-icon-wrap">
-        <div class="rotate-phone-icon"></div>
-        <div class="rotate-arrow">↻</div>
-      </div>
-      <h2 class="rotate-title">PLEASE ROTATE YOUR DEVICE</h2>
+      <h2 id="mobile-portrait-title" class="rotate-title">ADD TO HOME SCREEN</h2>
       <div class="rotate-status">
         <span class="rotate-rec-dot">●</span>
         <span>LANDSCAPE ORIENTATION REQUIRED</span>
       </div>
-      <p class="rotate-tip">Hold your phone sideways to enter the security office</p>
+      <p class="rotate-tip" style="margin-bottom:10px;">For the best experience, <strong style="color:#ffdd33;">add this game to your Home Screen</strong> to remove browser bars:</p>
+      <p class="rotate-tip"><strong style="color:#39ff14;">iPhone:</strong> Tap Share (⎋) → "Add to Home Screen" → "Add"</p>
+      <p class="rotate-tip"><strong style="color:#39ff14;">Android:</strong> Tap ⋮ menu → "Add to Home screen" → "Install"</p>
+      <p class="rotate-tip" style="margin-top:10px;">Open from your Home Screen and hold your phone sideways to play.</p>
+      <button id="portrait-btn-mobile-guide" class="title-action-btn" type="button">ADD TO HOME SCREEN</button>
     </div>
   </div>
 
@@ -95,8 +95,8 @@
         <button id="title-btn-controls" class="title-action-btn">
           <span class="action-icon">🎮</span> CONTROLS
         </button>
-        <button id="title-btn-mobile-guide" class="title-action-btn hidden" title="How to play in fullscreen on mobile">
-          <span class="action-icon">📱</span> PLAY ON MOBILE
+        <button id="title-btn-mobile-guide" class="title-action-btn hidden" title="Install this game on your Home Screen">
+          ADD TO HOME SCREEN
         </button>
         <button id="title-btn-reset" class="title-action-btn title-reset-btn" title="Reset Night Progression">
           <span>↺</span> RESET SAVE

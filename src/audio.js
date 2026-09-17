@@ -41,6 +41,8 @@ class SoundEngine {
     this.loops = {};
     this.titleAudio = null;
     this.runningAudio = null;
+    this._runningSource = null;
+    this._runningGain = null;
     this.masterVolume = 1.0;
     try {
       const saved = localStorage.getItem('fnaf_volume');
@@ -57,6 +59,12 @@ class SoundEngine {
     try {
       localStorage.setItem('fnaf_volume', this.masterVolume.toString());
     } catch (e) {}
+
+    if (this._runningGain) {
+      this._runningGain.gain.value = 3.0 * this.masterVolume;
+    } else if (this.runningAudio) {
+      this.runningAudio.volume = this.masterVolume;
+    }
 
     // Adjust active title audio
     if (this.titleAudio) {
@@ -201,8 +209,26 @@ class SoundEngine {
 
   playRunning() {
     this.stopRunning();
-    // Play authentic FNAF 1 Foxy hallway running footsteps
-    this.runningAudio = this.play('running', 1.0);
+    try {
+      const ctx = this.getAudioContext();
+      if (!ctx || ctx.state !== 'running') {
+        this.runningAudio = this.play('running', 1.0);
+        return;
+      }
+      const audio = new Audio(this.soundPaths.running);
+      const source = ctx.createMediaElementSource(audio);
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = 3.0 * this.masterVolume;
+      source.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      audio.volume = 1.0;
+      audio.play().catch(() => {});
+      this.runningAudio = audio;
+      this._runningSource = source;
+      this._runningGain = gainNode;
+    } catch (e) {
+      this.runningAudio = this.play('running', 1.0);
+    }
   }
 
   stopRunning() {
@@ -211,6 +237,12 @@ class SoundEngine {
         this.runningAudio.pause();
         this.runningAudio.currentTime = 0;
       } catch (e) {}
+      try {
+        if (this._runningSource) this._runningSource.disconnect();
+        if (this._runningGain) this._runningGain.disconnect();
+      } catch (e) {}
+      this._runningSource = null;
+      this._runningGain = null;
       this.runningAudio = null;
     }
   }

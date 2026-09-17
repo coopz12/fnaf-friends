@@ -319,6 +319,7 @@ class GameManager {
 
     // Mobile PWA / Add to Home Screen Guide Modal
     const btnMobileGuide = document.getElementById('title-btn-mobile-guide');
+    const portraitBtnMobileGuide = document.getElementById('portrait-btn-mobile-guide');
     const mobileGuideModal = document.getElementById('mobile-guide-modal');
     const btnCloseMobileGuide = document.getElementById('btn-close-mobile-guide');
     const btnGuideProceedAnyway = document.getElementById('btn-guide-proceed-anyway');
@@ -346,6 +347,7 @@ class GameManager {
     };
 
     if (btnMobileGuide) btnMobileGuide.addEventListener('click', openMobileGuide);
+    if (portraitBtnMobileGuide) portraitBtnMobileGuide.addEventListener('click', openMobileGuide);
     if (btnCloseMobileGuide) btnCloseMobileGuide.addEventListener('click', closeMobileGuide);
     if (btnGuideProceedAnyway) btnGuideProceedAnyway.addEventListener('click', closeMobileGuide);
 
@@ -1241,7 +1243,7 @@ class GameManager {
         this.onDoorClosed('left');
       } else {
         trevor.doorWaitSeconds += delta;
-        if (trevor.doorWaitSeconds > 4.5 || (this.cameras && this.cameras.isOpen && trevor.doorWaitSeconds > 1.2)) {
+        if (trevor.doorWaitSeconds > 12) {
           window.soundEngine.stopRunning();
           this.triggerJumpscare(trevor);
           return;
@@ -1255,7 +1257,7 @@ class GameManager {
         this.onDoorClosed('left');
       } else {
         this.friends.spencer.doorWaitSeconds += delta;
-        if (this.friends.spencer.doorWaitSeconds > 5.0) {
+        if (this.friends.spencer.doorWaitSeconds > 15) {
           this.triggerJumpscare(this.friends.spencer);
           return;
         }
@@ -1268,7 +1270,7 @@ class GameManager {
         this.onDoorClosed('right');
       } else {
         this.friends.daxon.doorWaitSeconds += delta;
-        if (this.friends.daxon.doorWaitSeconds > 5.0 || (this.cameras && this.cameras.isOpen && this.friends.daxon.doorWaitSeconds > 1.5)) {
+        if (this.friends.daxon.doorWaitSeconds > 15) {
           this.triggerJumpscare(this.friends.daxon);
           return;
         }
@@ -1280,7 +1282,7 @@ class GameManager {
         this.onDoorClosed('right');
       } else {
         this.friends.chris.doorWaitSeconds += delta;
-        if (this.friends.chris.doorWaitSeconds > 4.5) {
+        if (this.friends.chris.doorWaitSeconds > 15) {
           this.triggerJumpscare(this.friends.chris);
         }
       }
@@ -1644,7 +1646,7 @@ class GameManager {
     if (!this.isRunning || this.isPowerOut || this.isGameOver) return;
 
     // Check Left Door sneak-in (Spencer)
-    if (this.friends.spencer.currentRoom === 'left_door' && !this.office.leftDoorClosed) {
+    if (this.friends.spencer.currentRoom === 'left_door' && !this.office.leftDoorClosed && this.friends.spencer.doorWaitSeconds > 15) {
       console.log("Spencer sneaked into the office! Left door jammed!");
       this.leftInOffice = true;
       this.office.setJammed('left', true);
@@ -1652,12 +1654,12 @@ class GameManager {
     }
 
     // Check Right Door sneak-in (Daxon or Chris)
-    if (this.friends.daxon.currentRoom === 'right_door' && !this.office.rightDoorClosed) {
+    if (this.friends.daxon.currentRoom === 'right_door' && !this.office.rightDoorClosed && this.friends.daxon.doorWaitSeconds > 15) {
       console.log("Daxon sneaked into the office! Right door jammed!");
       this.rightInOffice = true;
       this.office.setJammed('right', true);
       this.friends.daxon.currentRoom = 'in_office';
-    } else if (this.friends.chris.currentRoom === 'right_door' && !this.office.rightDoorClosed) {
+    } else if (this.friends.chris.currentRoom === 'right_door' && !this.office.rightDoorClosed && this.friends.chris.doorWaitSeconds > 15) {
       console.log("Chris sneaked into the office! Right door jammed!");
       this.rightInOffice = true;
       this.office.setJammed('right', true);
